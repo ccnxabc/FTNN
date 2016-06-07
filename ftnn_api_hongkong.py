@@ -26,9 +26,9 @@ def MA(MA_x,Latest_Value):
 LastMinute=None
 LastTradeOrderTime=None
 
-file_souji_tmp="c:\\9\\ftnn_souji_700_4.csv"
-file_souji_all="c:\\9\\ftnn_souji_all_700_4.csv"
-file_souji_fengzhong="c:\\9\\ftnn_souji_700_4_fengzhong.csv"
+file_souji_tmp="c:\\9\\ftnn_souji_700_5.csv"
+file_souji_all="c:\\9\\ftnn_souji_all_700_5.csv"
+file_souji_fengzhong="c:\\9\\ftnn_souji_700_5_fengzhong.csv"
 
 df_4=pd.DataFrame()
 df_5=pd.DataFrame()
@@ -102,7 +102,6 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
             print "actual_minute<=LastMinute"
         else:
             print "actual_minute<=LastMinute NOT OK"
-
         if (int(current_minute)<=int(LastMinute)):
             print "current_minute<=LastMinute"
         else:
@@ -110,19 +109,19 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
     '''
 
     if LastMinute!=None:
-        if (int(actual_minute)<=int(LastMinute) and int(actual_hour)<=int(LastHour)):
-            print "(int(actual_minute)<=int(LastMinute) and int(actual_hour)<=int(LastHour))"
+        if ( (int(actual_minute)<=int(LastMinute) and int(actual_hour)==int(LastHour)) or int(actual_hour)<int(LastHour)  ):
+            print "(int(actual_minute)<=int(LastMinute) and int(actual_hour)==int(LastHour)) or int(actual_hour)<int(LastHour)"
         else:
-            print "(int(actual_minute)<=int(LastMinute) and int(actual_hour)<=int(LastHour)) NOT OK"
+            print "(int(actual_minute)<=int(LastMinute) and int(actual_hour)==int(LastHour)) or int(actual_hour)<int(LastHour) NOT OK"
 
-        if (int(current_minute)<=int(LastMinute) and int(current_hour)<=int(LastHour)):
-            print "int(current_minute)<=int(LastMinute) and int(current_hour)<=int(LastHour)"
+        if ( (int(current_minute)<=int(LastMinute) and int(current_hour)==int(LastHour))  or int(current_hour)<int(LastHour)  ):
+            print "(int(current_minute)<=int(LastMinute) and int(current_hour)==int(LastHour))  or int(current_hour)<int(LastHour)"
         else:
-            print "int(current_minute)<=int(LastMinute) and int(current_hour)<=int(LastHour) NOT OK"
+            print "(int(current_minute)<=int(LastMinute) and int(current_hour)==int(LastHour))  or int(current_hour)<int(LastHour) NOT OK"
 
     if LastMinute==None or \
-        (   (int(actual_minute)<=int(LastMinute) and int(actual_hour)<=int(LastHour)) and \
-            (int(current_minute)<=int(LastMinute) and int(current_hour)<=int(LastHour))   ):
+        (   (   (int(actual_minute)<=int(LastMinute) and int(actual_hour)==int(LastHour)) or int(actual_hour)<int(LastHour) )and \
+            (   (int(current_minute)<=int(LastMinute) and int(current_hour)==int(LastHour))  or int(current_hour)<int(LastHour) ) ):
         if os.path.exists(file_souji_tmp)==False:
             f=open(file_souji_tmp,"w")
             print>>f,"Date,Price"
@@ -178,7 +177,7 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
             #就是为了更换一个index,需要这么麻烦吗
             if int(actual_minute)==0:
                 #针对整点，分钟为0的场景，减1分钟应该是59分，而不是-1
-                str_tmp=time.strftime("%Y-%m-%d ",now_time)+str(int(actual_hour)-1)+'59'
+                str_tmp=time.strftime("%Y-%m-%d ",now_time)+str(int(actual_hour)-1)+':59'
             else:
                 str_tmp=time.strftime("%Y-%m-%d %H:",now_time)+str(int(actual_minute)-1) #就是为了更换一个index,需要这么麻烦吗
             df_7 = pd.DataFrame(df_tmp.ix[0].open, index=[str_tmp],columns=['open'])
