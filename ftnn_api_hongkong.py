@@ -22,13 +22,57 @@ def MA(MA_x,Latest_Value):
     value_tmp=(df_tmp.ix[:,3].tail(MA_x-1).sum()+Latest_Value)/MA_x
     return value_tmp
 
+def MACD(Latest_Value):
+    #使用通达信的MACD计算方法：
+    #第一天：EMA_12=收盘价；EMA_26=收盘价；DIF=0；DEA=0;MACD=0(不套用公式）
+    #第二天-第N天:套用公式
+    #EMA（12）= 前一日EMA（12）×11/13＋今日收盘价×2/13
+    #EMA（26）= 前一日EMA（26）×25/27＋今日收盘价×2/27
+    #DIFF=今日EMA（12）- 今日EMA（26）
+    #DEA（MACD）= 前一日DEA×8/10＋今日DIF×2/10
+    #BAR=2×(DIFF－DEA)
+    #参考http://blog.sina.com.cn/s/blog_5938eb510100fz89.html
+
+    global file_souji_fengzhong
+    MACD_EMA_SHORT_POSITION=10
+
+    short = 12
+    long = 26
+    mid = 9
+    df_tmp=pd.read_csv(file_souji_fengzhong,index_col=0)
+
+    if len(df_tmp)==0:
+        MACD_EMA_short=Latest_Value
+        MACD_EMA_long =Latest_Value
+        MACD_DIF = 0
+        MACD_DEA = 0
+        MACD_MACD = 0
+
+    else:
+        Last_Trade_4_MACD=df_tmp.tail(1)
+        MACD_EMA_short=Last_Trade_4_MACD.ix[0,MACD_EMA_SHORT_POSITION]*(short-1)/(short+1)+\
+                       Latest_Value*2/(short+1)
+
+        MACD_EMA_long=Last_Trade_4_MACD.ix[0,MACD_EMA_SHORT_POSITION+1]*(long-1)/(long+1)+\
+                       Latest_Value*2/(long+1)
+
+        MACD_DIF = MACD_EMA_short - MACD_EMA_long
+
+        MACD_DEA =Last_Trade_4_MACD.ix[0,MACD_EMA_SHORT_POSITION+3]*(mid-1)/(mid+1)+\
+                  MACD_DIF*2/(mid+1)
+
+        MACD_MACD = (MACD_DIF - MACD_DEA) * 2
+
+    return MACD_EMA_short,MACD_EMA_long,MACD_DIF,MACD_DEA,MACD_MACD
+
+
 # 上一分钟信息
 LastMinute=None
 LastTradeOrderTime=None
 
-file_souji_tmp="c:\\9\\ftnn_souji_700_5.csv"
-file_souji_all="c:\\9\\ftnn_souji_all_700_5.csv"
-file_souji_fengzhong="c:\\9\\ftnn_souji_700_5_fengzhong.csv"
+file_souji_tmp="c:\\9\\ftnn_souji_700_7.csv"
+file_souji_all="c:\\9\\ftnn_souji_all_700_7.csv"
+file_souji_fengzhong="c:\\9\\ftnn_souji_700_7_fengzhong.csv"
 
 df_4=pd.DataFrame()
 df_5=pd.DataFrame()
@@ -96,18 +140,6 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
     print "actual_minute:",actual_minute
     print "current_minute:",current_minute
 
-    '''
-    if LastMinute!=None:
-        if (int(actual_minute)<=int(LastMinute)):
-            print "actual_minute<=LastMinute"
-        else:
-            print "actual_minute<=LastMinute NOT OK"
-        if (int(current_minute)<=int(LastMinute)):
-            print "current_minute<=LastMinute"
-        else:
-            print "current_minute<=LastMinute NOT OK"
-    '''
-
     if LastMinute!=None:
         if ( (int(actual_minute)<=int(LastMinute) and int(actual_hour)==int(LastHour)) or int(actual_hour)<int(LastHour)  ):
             print "(int(actual_minute)<=int(LastMinute) and int(actual_hour)==int(LastHour)) or int(actual_hour)<int(LastHour)"
@@ -134,7 +166,7 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
 
         if os.path.exists(file_souji_fengzhong)==False:
             f=open(file_souji_fengzhong,"w")
-            print>>f," ,open,high,low,close,MA5,MA10,MA20,MA30,MA60,MA120"
+            print>>f," ,open,high,low,close,MA5,MA10,MA20,MA30,MA60,MA120,MACD_EMA_12,MACD_EMA_26,MACD_DIF,MACD_DEA,MACD_MACD"
             f.close()
 
         f=open(file_souji_tmp,"a")
@@ -150,18 +182,6 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
         df_1.index=pd.tseries.index.DatetimeIndex(df_1.ix[:,0])
         df_2=df_1.ix[:,1]
         df_3=df_2.resample('1min',how='ohlc')
-
-        '''
-        df_5=pd.read_csv(file_souji_fengzhong,index_col=0)
-        df_5=df_5.append(df_3.ix[0])
-        MA5_tmp=MA(5,df_3.ix[0,3])
-        MA10_tmp=MA(10,df_3.ix[0,3])
-        MA20_tmp=MA(20,df_3.ix[0,3])
-        MA30_tmp=MA(30,df_3.ix[0,3])
-        MA60_tmp=MA(60,df_3.ix[0,3])
-        MA120_tmp=MA(120,df_3.ix[0,3])
-        df_5.to_csv(file_souji_fengzhong)
-        '''
 
         df_5=pd.read_csv(file_souji_fengzhong,index_col=0)
         #df_tmp=df_3.ix[0]
@@ -186,28 +206,6 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
             df_7['close'] =df_tmp['close'].ix[0]
             df_tmp=df_7
 
-        '''
-        if len(df_5)==0:
-            df_tmp=df_3.tail(1)
-        elif len(df_5)>0:
-            for i_tmp in range(1,len(df_5)+1):
-                if df_3.head(i_tmp).tail(1).index>pd.tseries.index.DatetimeIndex(df_5.tail(1).index):
-                     df_tmp=df_3.head(i_tmp).tail(1)
-                     break
-        else:
-            #就是为了更换一个index,需要这么麻烦吗
-            if actual_minute==0:
-                #针对整点，分钟为0的场景，减1分钟应该是59分，而不是-1
-                str_tmp=time.strftime("%Y-%m-%d %H:",now_time)+'59'
-            else:
-                str_tmp=time.strftime("%Y-%m-%d %H:",now_time)+str(int(actual_minute)-1) #就是为了更换一个index,需要这么麻烦吗
-            df_7 = pd.DataFrame(df_tmp.ix[0].open, index=[str_tmp],columns=['open'])
-            df_7['high']=df_tmp['high'].ix[0]
-            df_7['low'] =df_tmp['low'].ix[0]
-            df_7['close'] =df_tmp['close'].ix[0]
-            df_tmp=df_7
-            '''
-
         print df_tmp
         print "------"
         print df_3
@@ -231,6 +229,16 @@ while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
         df_tmp['MA30']=MA30_tmp
         df_tmp['MA60']=MA60_tmp
         df_tmp['MA120']=MA120_tmp
+
+        #增加MACD
+        MACD_EMA_short,MACD_EMA_long,MACD_DIF,MACD_DEA,MACD_MACD=MACD(df_tmp.ix[0,3])
+
+        df_tmp['MACD_EMA_12']=MACD_EMA_short
+        df_tmp['MACD_EMA_26']=MACD_EMA_long
+        df_tmp['MACD_DIF']=MACD_DIF
+        df_tmp['MACD_DEA']=MACD_DEA
+        df_tmp['MACD_MACD']=MACD_MACD
+
         df_5=df_5.append(df_tmp)
 
         df_5.to_csv(file_souji_fengzhong)
