@@ -5,6 +5,8 @@ Created on 2015年8月26日
 @author: futu
 '''
 
+#时区采用的是汉城时区
+
 #如果这个分钟内没有一笔成交，这个是
 
 import socket
@@ -70,9 +72,11 @@ def MACD(Latest_Value):
 LastMinute=None
 LastTradeOrderTime=None
 
-file_souji_tmp="c:\\9\\ftnn_souji_700_7.csv"
-file_souji_all="c:\\9\\ftnn_souji_all_700_7.csv"
-file_souji_fengzhong="c:\\9\\ftnn_souji_700_7_fengzhong.csv"
+local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
+
+file_souji_tmp="C:\\IBM-9\\FTNN_HK\\ftnn_souji_700_7"+"_"+local_date_4_file+".csv"
+file_souji_all="C:\IBM-9\FTNN_HK\\ftnn_souji_all_700_7"+"_"+local_date_4_file+".csv"
+file_souji_fengzhong="C:\IBM-9\FTNN_HK\\ftnn_souji_700_7_fengzhong"+"_"+local_date_4_file+".csv"
 
 df_4=pd.DataFrame()
 df_5=pd.DataFrame()
@@ -91,10 +95,10 @@ s.connect((host,port))
 
 #需要确认电脑时区是香港时区
 now_time=time.localtime(time.time()-24*60*60)
-while (now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S") \
-        and now_time>time.strptime(local_date+" "+"09:30:00", "%Y-%m-%d %H:%M:%S")) \
-    or ( now_time>time.strptime(local_date+" "+"13:00:00", "%Y-%m-%d %H:%M:%S") and\
-        now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S") ):
+while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
+        and now_time>time.strptime(local_date+" "+"10:30:00", "%Y-%m-%d %H:%M:%S")) \
+    or ( now_time>time.strptime(local_date+" "+"14:00:00", "%Y-%m-%d %H:%M:%S") and\
+        now_time<time.strptime(local_date+" "+"17:00:01", "%Y-%m-%d %H:%M:%S") ):
     #发送报价请求，Market为2表示是美股
     req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
     #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
