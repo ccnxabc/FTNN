@@ -17,6 +17,83 @@ from time import sleep
 import time
 import os
 import pandas as pd
+import math
+
+import winsound
+
+def Example_Analysis():
+    global file_souji_fengzhong
+    global local_date_4_file
+    wav_file_up="C:\\Windows\\Media\\StarWar_force.wav"
+    wav_file_down="C:\\Windows\\Media\\StarWar_nuclear.wav"
+    file_result_example="C:\\IBM-9\\FTNN_HK\\Analysis_out_example"+"_"+local_date_4_file+".csv"
+
+    df_tmp=pd.read_csv(file_souji_fengzhong)
+    last_line_data=df_tmp.tail(1)
+    if math.isnan(last_line_data.ix[0,8])==False:
+        if last_line_data.ix[0,4] > last_line_data.ix[0,5] and \
+            last_line_data.ix[0,5] > last_line_data.ix[0,6] and \
+            last_line_data.ix[0,6] > last_line_data.ix[0,7] and \
+            last_line_data.ix[0,7] > last_line_data.ix[0,6] :
+            winsound.PlaySound(wav_file_up, winsound.SND_NODEFAULT)
+            f=open(file_result_example,"w")
+            print >>f,"Up,Time:"+str(last_line_data.ix[0,0])+","\
+                       "MA5:" +str(last_line_data.ix[0,4])+","\
+                       "MA10:"+str(last_line_data.ix[0,5])+","\
+                       "MA20:"+str(last_line_data.ix[0,6])+","\
+                       "MA30:"+str(last_line_data.ix[0,7])+","\
+                       "MA60:"+str(last_line_data.ix[0,8])
+            f.close()
+        elif last_line_data.ix[0,4] < last_line_data.ix[0,5] and \
+            last_line_data.ix[0,5] < last_line_data.ix[0,6] and \
+            last_line_data.ix[0,6] < last_line_data.ix[0,7] and \
+            last_line_data.ix[0,7] < last_line_data.ix[0,6] :
+            winsound.PlaySound(wav_file_down, winsound.SND_NODEFAULT)
+            f=open(file_result_example,"w")
+            print >>f,"Down,Time:"+str(last_line_data.ix[0,0])+","\
+                       "MA5:" +str(last_line_data.ix[0,4])+","\
+                       "MA10:"+str(last_line_data.ix[0,5])+","\
+                       "MA20:"+str(last_line_data.ix[0,6])+","\
+                       "MA30:"+str(last_line_data.ix[0,7])+","\
+                       "MA60:"+str(last_line_data.ix[0,8])
+            f.close()
+
+def MA_xielv(XieLv_Num,MA5,MA10,MA20,MA30,MA60,MA120):
+    global df_5
+    df_tmp=df_5.tail(XieLv_Num-1)
+    lenth_df_tmp=len(df_5)
+    if math.isnan(df_tmp.ix[0,4])!=False:
+        MA5_xielv=(MA5-df_tmp.ix[0,4])/df_tmp.ix[0,4]
+    else:
+        MA5_xielv=np.nan
+
+    if math.isnan(df_tmp.ix[0,5])!=False:
+        MA10_xielv=(MA10-df_tmp.ix[0,5])/df_tmp.ix[0,5]
+    else:
+        MA10_xielv=np.nan
+
+    if math.isnan(df_tmp.ix[0,6])!=False:
+        MA20_xielv=(MA20-df_tmp.ix[0,6])/df_tmp.ix[0,6]
+    else:
+        MA20_xielv=np.nan
+
+    if math.isnan(df_tmp.ix[0,7])!=False:
+        MA30_xielv=(MA30-df_tmp.ix[0,7])/df_tmp.ix[0,7]
+    else:
+        MA30_xielv=np.nan
+
+    if math.isnan(df_tmp.ix[0,8])!=False:
+        MA60_xielv=(MA60-df_tmp.ix[0,8])/df_tmp.ix[0,8]
+    else:
+        MA60_xielv=np.nan
+
+    if math.isnan(df_tmp.ix[0,9])!=False:
+        MA120_xielv=(MA120-df_tmp.ix[0,9])/df_tmp.ix[0,9]
+    else:
+        MA120_xielv=np.nan
+
+    return MA5_xielv,MA10_xielv,MA20_xielv,MA30_xielv,MA60_xielv,MA120_xielv
+
 
 def MA(MA_x,Latest_Value):
     global file_souji_fengzhong
@@ -170,7 +247,7 @@ while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
 
         if os.path.exists(file_souji_fengzhong)==False:
             f=open(file_souji_fengzhong,"w")
-            print>>f," ,open,high,low,close,MA5,MA10,MA20,MA30,MA60,MA120,MACD_EMA_12,MACD_EMA_26,MACD_DIF,MACD_DEA,MACD_MACD"
+            print>>f," ,open,high,low,close,MA5,MA10,MA20,MA30,MA60,MA120,MA5_XieLv_0,MA10_XieLv_0,MA20_XieLv_0,MA30_XieLv_0,MA60_XieLv_0,MA120_XieLv_0,MACD_EMA_12,MACD_EMA_26,MACD_DIF,MACD_DEA,MACD_MACD"
             f.close()
 
         f=open(file_souji_tmp,"a")
@@ -234,6 +311,18 @@ while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
         df_tmp['MA60']=MA60_tmp
         df_tmp['MA120']=MA120_tmp
 
+        #计算各个MA斜率
+        XieLv_Num=3
+        MA5_xielv,MA10_xielv,MA20_xielv,MA30_xielv,MA60_xielv,MA120_xielv=MA_xielv(XieLv_Num,MA5_tmp,MA10_tmp,MA20_tmp,MA30_tmp,MA60_tmp,MA120_tmp)
+
+        df_tmp['MA5_XieLv_0']= MA5_xielv
+        df_tmp['MA10_XieLv_0']= MA10_xielv
+        df_tmp['MA20_XieLv_0']= MA20_xielv
+        df_tmp['MA30_XieLv_0']= MA30_xielv
+        df_tmp['MA60_XieLv_0']= MA60_xielv
+        df_tmp['MA120_XieLv_0']= MA120_xielv
+
+
         #增加MACD
         MACD_EMA_short,MACD_EMA_long,MACD_DIF,MACD_DEA,MACD_MACD=MACD(df_tmp.ix[0,3])
 
@@ -267,6 +356,10 @@ while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
     elif int(actual_hour)< int(current_hour):
         LastHour=current_hour
         LastMinute=current_minute
+
+    # Example:To Analysis Data
+    Example_Analysis()
+
 
     sleep(0.5)
     now_time=time.localtime(time.time()-24*60*60)
