@@ -18,6 +18,7 @@ import time
 import os
 import pandas as pd
 import math
+import numpy as np
 
 import winsound
 
@@ -30,65 +31,66 @@ def Example_Analysis():
 
     df_tmp=pd.read_csv(file_souji_fengzhong)
     last_line_data=df_tmp.tail(1)
-    if math.isnan(last_line_data.ix[0,8])==False:
-        if last_line_data.ix[0,4] > last_line_data.ix[0,5] and \
-            last_line_data.ix[0,5] > last_line_data.ix[0,6] and \
-            last_line_data.ix[0,6] > last_line_data.ix[0,7] and \
-            last_line_data.ix[0,7] > last_line_data.ix[0,6] :
+    if len(df_tmp)>0 and math.isnan(last_line_data.ix[:,8])==False:
+        if last_line_data.ix[:,4] > last_line_data.ix[:,5] and \
+            last_line_data.ix[:,5] > last_line_data.ix[:,6]:
+            #last_line_data.ix[0,6] > last_line_data.ix[0,7] and \
+            #last_line_data.ix[0,7] > last_line_data.ix[0,8] :
             winsound.PlaySound(wav_file_up, winsound.SND_NODEFAULT)
             f=open(file_result_example,"w")
-            print >>f,"Up,Time:"+str(last_line_data.ix[0,0])+","\
-                       "MA5:" +str(last_line_data.ix[0,4])+","\
-                       "MA10:"+str(last_line_data.ix[0,5])+","\
-                       "MA20:"+str(last_line_data.ix[0,6])+","\
-                       "MA30:"+str(last_line_data.ix[0,7])+","\
-                       "MA60:"+str(last_line_data.ix[0,8])
+            print >>f,"Up,Time:"+str(last_line_data.ix[:,0])+","\
+                       "MA5:" +str(last_line_data.ix[:,4])+","\
+                       "MA10:"+str(last_line_data.ix[:,5])+","\
+                       "MA20:"+str(last_line_data.ix[:,6])+","\
+                       "MA30:"+str(last_line_data.ix[:,7])+","\
+                       "MA60:"+str(last_line_data.ix[:,8])
             f.close()
-        elif last_line_data.ix[0,4] < last_line_data.ix[0,5] and \
-            last_line_data.ix[0,5] < last_line_data.ix[0,6] and \
-            last_line_data.ix[0,6] < last_line_data.ix[0,7] and \
-            last_line_data.ix[0,7] < last_line_data.ix[0,6] :
+
+        elif last_line_data.ix[:,4] < last_line_data.ix[:,5] and \
+            last_line_data.ix[:,5] < last_line_data.ix[:,6]:
+            #last_line_data.ix[0,6] < last_line_data.ix[0,7] and \
+            #last_line_data.ix[0,7] < last_line_data.ix[0,8] :
             winsound.PlaySound(wav_file_down, winsound.SND_NODEFAULT)
             f=open(file_result_example,"w")
-            print >>f,"Down,Time:"+str(last_line_data.ix[0,0])+","\
-                       "MA5:" +str(last_line_data.ix[0,4])+","\
-                       "MA10:"+str(last_line_data.ix[0,5])+","\
-                       "MA20:"+str(last_line_data.ix[0,6])+","\
-                       "MA30:"+str(last_line_data.ix[0,7])+","\
-                       "MA60:"+str(last_line_data.ix[0,8])
+            print >>f,"Down,Time:"+str(last_line_data.ix[:,0])+","\
+                       "MA5:" +str(last_line_data.ix[:,4])+","\
+                       "MA10:"+str(last_line_data.ix[:,5])+","\
+                       "MA20:"+str(last_line_data.ix[:,6])+","\
+                       "MA30:"+str(last_line_data.ix[:,7])+","\
+                       "MA60:"+str(last_line_data.ix[:,8])
             f.close()
 
 def MA_xielv(XieLv_Num,MA5,MA10,MA20,MA30,MA60,MA120):
     global df_5
-    df_tmp=df_5.tail(XieLv_Num-1)
+    df_tmp=df_5.tail(XieLv_Num-1).head(1)
     lenth_df_tmp=len(df_5)
-    if math.isnan(df_tmp.ix[0,4])!=False:
-        MA5_xielv=(MA5-df_tmp.ix[0,4])/df_tmp.ix[0,4]
+    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,4])!=False:
+        MA5_xielv=(MA5-df_tmp.ix[:,4])/df_tmp.ix[:,4]
     else:
         MA5_xielv=np.nan
 
-    if math.isnan(df_tmp.ix[0,5])!=False:
-        MA10_xielv=(MA10-df_tmp.ix[0,5])/df_tmp.ix[0,5]
+    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,5])!=False:
+        MA10_xielv=(MA10-df_tmp.ix[:,5])/df_tmp.ix[:,5]
     else:
         MA10_xielv=np.nan
 
-    if math.isnan(df_tmp.ix[0,6])!=False:
-        MA20_xielv=(MA20-df_tmp.ix[0,6])/df_tmp.ix[0,6]
+    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,6])!=False:
+        MA20_xielv=(MA20-df_tmp.ix[:,6])/df_tmp.ix[:,6]
     else:
         MA20_xielv=np.nan
 
-    if math.isnan(df_tmp.ix[0,7])!=False:
-        MA30_xielv=(MA30-df_tmp.ix[0,7])/df_tmp.ix[0,7]
+    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,7])!=False:
+        MA30_xielv=(MA30-df_tmp.ix[:,7])/df_tmp.ix[:,7]
     else:
         MA30_xielv=np.nan
 
-    if math.isnan(df_tmp.ix[0,8])!=False:
-        MA60_xielv=(MA60-df_tmp.ix[0,8])/df_tmp.ix[0,8]
+    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,8])!=False:
+        MA60_xielv=(MA60-df_tmp.ix[:,8])/df_tmp.ix[:,8]
     else:
         MA60_xielv=np.nan
 
-    if math.isnan(df_tmp.ix[0,9])!=False:
-        MA120_xielv=(MA120-df_tmp.ix[0,9])/df_tmp.ix[0,9]
+    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,9])!=False:
+        MA120_xielv=(MA120-df_tmp.ix[:,9])/df_tmp.ix[:,9]
     else:
         MA120_xielv=np.nan
 
@@ -151,9 +153,9 @@ LastTradeOrderTime=None
 
 local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
 
-file_souji_tmp="C:\\IBM-9\\FTNN_HK\\ftnn_souji_700_7"+"_"+local_date_4_file+".csv"
-file_souji_all="C:\IBM-9\FTNN_HK\\ftnn_souji_all_700_7"+"_"+local_date_4_file+".csv"
-file_souji_fengzhong="C:\IBM-9\FTNN_HK\\ftnn_souji_700_7_fengzhong"+"_"+local_date_4_file+".csv"
+file_souji_tmp="C:\\IBM-9\\FTNN_HK\\ftnn_souji_700_8"+"_"+local_date_4_file+".csv"
+file_souji_all="C:\IBM-9\FTNN_HK\\ftnn_souji_all_700_8"+"_"+local_date_4_file+".csv"
+file_souji_fengzhong="C:\IBM-9\FTNN_HK\\ftnn_souji_700_8_fengzhong"+"_"+local_date_4_file+".csv"
 
 df_4=pd.DataFrame()
 df_5=pd.DataFrame()
@@ -342,6 +344,10 @@ while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
         print>>f,"Date,Price"
         print>>f,local_date+" "+str(current_hour)+":"+str(current_minute)+":"+str(current_second)+","+str(current_price)
         f.close()
+
+        # Example:To Analysis Data
+        Example_Analysis()
+
         #似乎还要往前
         LastTradeOrderTime=trade_order_time
         #caculate_zhibiao(df_3.ix[0,0],)
@@ -357,8 +363,7 @@ while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
         LastHour=current_hour
         LastMinute=current_minute
 
-    # Example:To Analysis Data
-    Example_Analysis()
+
 
 
     sleep(0.5)
