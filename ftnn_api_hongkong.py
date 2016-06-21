@@ -29,68 +29,75 @@ def Example_Analysis():
     wav_file_down="C:\\Windows\\Media\\StarWar_nuclear.wav"
     file_result_example="C:\\IBM-9\\FTNN_HK\\Analysis_out_example"+"_"+local_date_4_file+".csv"
 
+    if os.path.exists(file_result_example)==False:
+        f=open(file_result_example,"w")
+        print >>f,"MA Up/Down,Time,MA5,MA10,MA20,MA30,MA60"
+        f.close()
+
     df_tmp=pd.read_csv(file_souji_fengzhong)
     last_line_data=df_tmp.tail(1)
-    if len(df_tmp)>0 and math.isnan(last_line_data.ix[:,8])==False:
-        if last_line_data.ix[:,4] > last_line_data.ix[:,5] and \
-            last_line_data.ix[:,5] > last_line_data.ix[:,6]:
+    #if len(df_tmp)>0 and math.isnan(last_line_data.ix[:,8])==False:
+
+    if len(df_tmp)>20:
+        if (last_line_data.ix[:,4] > last_line_data.ix[:,5]).bool() and \
+            (last_line_data.ix[:,5] > last_line_data.ix[:,6]).bool():
             #last_line_data.ix[0,6] > last_line_data.ix[0,7] and \
             #last_line_data.ix[0,7] > last_line_data.ix[0,8] :
             winsound.PlaySound(wav_file_up, winsound.SND_NODEFAULT)
-            f=open(file_result_example,"w")
-            print >>f,"Up,Time:"+str(last_line_data.ix[:,0])+","\
-                       "MA5:" +str(last_line_data.ix[:,4])+","\
-                       "MA10:"+str(last_line_data.ix[:,5])+","\
-                       "MA20:"+str(last_line_data.ix[:,6])+","\
-                       "MA30:"+str(last_line_data.ix[:,7])+","\
-                       "MA60:"+str(last_line_data.ix[:,8])
+            f=open(file_result_example,"a")
+            print >>f,"Up,"+str(list(last_line_data.ix[:,0]).pop())+","\
+                        +str(list(last_line_data.ix[:,4]).pop())+","\
+                        +str(list(last_line_data.ix[:,5]).pop())+","\
+                        +str(list(last_line_data.ix[:,6]).pop())+","\
+                        +str(list(last_line_data.ix[:,7]).pop())+","\
+                        +str(list(last_line_data.ix[:,8]).pop())
             f.close()
 
-        elif last_line_data.ix[:,4] < last_line_data.ix[:,5] and \
-            last_line_data.ix[:,5] < last_line_data.ix[:,6]:
+        elif (last_line_data.ix[:,4] < last_line_data.ix[:,5]).bool() and \
+              (last_line_data.ix[:,5] < last_line_data.ix[:,6]).bool():
             #last_line_data.ix[0,6] < last_line_data.ix[0,7] and \
             #last_line_data.ix[0,7] < last_line_data.ix[0,8] :
             winsound.PlaySound(wav_file_down, winsound.SND_NODEFAULT)
-            f=open(file_result_example,"w")
-            print >>f,"Down,Time:"+str(last_line_data.ix[:,0])+","\
-                       "MA5:" +str(last_line_data.ix[:,4])+","\
-                       "MA10:"+str(last_line_data.ix[:,5])+","\
-                       "MA20:"+str(last_line_data.ix[:,6])+","\
-                       "MA30:"+str(last_line_data.ix[:,7])+","\
-                       "MA60:"+str(last_line_data.ix[:,8])
+            f=open(file_result_example,"a")
+            print >>f,"Down,"+str(list(last_line_data.ix[:,0]).pop())+","\
+                       +str(list(last_line_data.ix[:,4]).pop())+","\
+                       +str(list(last_line_data.ix[:,5]).pop())+","\
+                       +str(list(last_line_data.ix[:,6]).pop())+","\
+                       +str(list(last_line_data.ix[:,7]).pop())+","\
+                       +str(list(last_line_data.ix[:,8]).pop())
             f.close()
 
 def MA_xielv(XieLv_Num,MA5,MA10,MA20,MA30,MA60,MA120):
     global df_5
     df_tmp=df_5.tail(XieLv_Num-1).head(1)
     lenth_df_tmp=len(df_5)
-    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,4])!=False:
-        MA5_xielv=(MA5-df_tmp.ix[:,4])/df_tmp.ix[:,4]
+    if lenth_df_tmp>5 and math.isnan(df_tmp.ix[:,4])==False:
+        MA5_xielv=(MA5-list(df_tmp.ix[:,4]).pop())/list(df_tmp.ix[:,4]).pop()
     else:
         MA5_xielv=np.nan
 
-    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,5])!=False:
-        MA10_xielv=(MA10-df_tmp.ix[:,5])/df_tmp.ix[:,5]
+    if lenth_df_tmp>10 and math.isnan(df_tmp.ix[:,5])==False:
+        MA10_xielv=(MA10-list(df_tmp.ix[:,5]).pop())/list(df_tmp.ix[:,5]).pop()
     else:
         MA10_xielv=np.nan
 
-    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,6])!=False:
-        MA20_xielv=(MA20-df_tmp.ix[:,6])/df_tmp.ix[:,6]
+    if lenth_df_tmp>20 and math.isnan(df_tmp.ix[:,6])==False:
+        MA20_xielv=(MA20-list(df_tmp.ix[:,6]).pop())/list(df_tmp.ix[:,6]).pop()
     else:
         MA20_xielv=np.nan
 
-    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,7])!=False:
-        MA30_xielv=(MA30-df_tmp.ix[:,7])/df_tmp.ix[:,7]
+    if lenth_df_tmp>30 and math.isnan(df_tmp.ix[:,7])==False:
+        MA30_xielv=(MA30-list(df_tmp.ix[:,7]).pop())/list(df_tmp.ix[:,7]).pop()
     else:
         MA30_xielv=np.nan
 
-    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,8])!=False:
-        MA60_xielv=(MA60-df_tmp.ix[:,8])/df_tmp.ix[:,8]
+    if lenth_df_tmp>60 and math.isnan(df_tmp.ix[:,8])==False:
+        MA60_xielv=(MA60-list(df_tmp.ix[:,8]).pop())/list(df_tmp.ix[:,8]).pop()
     else:
         MA60_xielv=np.nan
 
-    if lenth_df_tmp>0 and math.isnan(df_tmp.ix[:,9])!=False:
-        MA120_xielv=(MA120-df_tmp.ix[:,9])/df_tmp.ix[:,9]
+    if lenth_df_tmp>120 and math.isnan(df_tmp.ix[:,9])==False:
+        MA120_xielv=(MA120-list(df_tmp.ix[:,9]).pop())/list(df_tmp.ix[:,9]).pop()
     else:
         MA120_xielv=np.nan
 
@@ -115,12 +122,12 @@ def MACD(Latest_Value):
     #参考http://blog.sina.com.cn/s/blog_5938eb510100fz89.html
 
     global file_souji_fengzhong
-    MACD_EMA_SHORT_POSITION=10
 
     short = 12
     long = 26
     mid = 9
     df_tmp=pd.read_csv(file_souji_fengzhong,index_col=0)
+    MACD_EMA_SHORT_POSITION=df_tmp.columns.searchsorted('MACD_EMA_12')
 
     if len(df_tmp)==0:
         MACD_EMA_short=Latest_Value
@@ -153,9 +160,9 @@ LastTradeOrderTime=None
 
 local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
 
-file_souji_tmp="C:\\IBM-9\\FTNN_HK\\ftnn_souji_700_8"+"_"+local_date_4_file+".csv"
-file_souji_all="C:\IBM-9\FTNN_HK\\ftnn_souji_all_700_8"+"_"+local_date_4_file+".csv"
-file_souji_fengzhong="C:\IBM-9\FTNN_HK\\ftnn_souji_700_8_fengzhong"+"_"+local_date_4_file+".csv"
+file_souji_tmp="C:\\IBM-9\\FTNN_HK\\ftnn_souji_00700_8"+"_"+local_date_4_file+".csv"
+file_souji_all="C:\IBM-9\FTNN_HK\\ftnn_souji_all_00700_8"+"_"+local_date_4_file+".csv"
+file_souji_fengzhong="C:\IBM-9\FTNN_HK\\ftnn_souji_00700_8_fengzhong"+"_"+local_date_4_file+".csv"
 
 df_4=pd.DataFrame()
 df_5=pd.DataFrame()
@@ -174,10 +181,8 @@ s.connect((host,port))
 
 #需要确认电脑时区是香港时区
 now_time=time.localtime(time.time()-24*60*60)
-while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
-        and now_time>time.strptime(local_date+" "+"10:30:00", "%Y-%m-%d %H:%M:%S")) \
-    or ( now_time>time.strptime(local_date+" "+"14:00:00", "%Y-%m-%d %H:%M:%S") and\
-        now_time<time.strptime(local_date+" "+"17:00:01", "%Y-%m-%d %H:%M:%S") ):
+while (now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S") \
+        and now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S")):
     #发送报价请求，Market为2表示是美股
     req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
     #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
@@ -362,8 +367,6 @@ while (now_time<time.strptime(local_date+" "+"13:00:01", "%Y-%m-%d %H:%M:%S") \
     elif int(actual_hour)< int(current_hour):
         LastHour=current_hour
         LastMinute=current_minute
-
-
 
 
     sleep(0.5)
