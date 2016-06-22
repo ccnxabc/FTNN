@@ -158,7 +158,8 @@ def MACD(Latest_Value):
 LastMinute=None
 LastTradeOrderTime=None
 
-local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
+#local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
+local_date_4_file=time.strftime('%Y%m%d',time.localtime(time.time()-24*60*60))
 
 file_souji_tmp="C:\\IBM-9\\FTNN_HK\\ftnn_souji_00700_8"+"_"+local_date_4_file+".csv"
 file_souji_all="C:\IBM-9\FTNN_HK\\ftnn_souji_all_00700_8"+"_"+local_date_4_file+".csv"
@@ -369,5 +370,5 @@ while (now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S") \
         LastMinute=current_minute
 
 
-    sleep(0.5)
+    sleep(1.2)
     now_time=time.localtime(time.time()-24*60*60)
