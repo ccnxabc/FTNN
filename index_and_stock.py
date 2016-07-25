@@ -24,6 +24,16 @@ import winsound
 
 import win32com.client
 
+import multiprocessing
+
+def speak_string(speak_str):
+    spk = win32com.client.Dispatch("SAPI.SpVoice")
+    spk.Speak(speak_str)
+
+def play_wav_sound(wav_file):
+    winsound.PlaySound(wav_file, winsound.SND_NODEFAULT)
+    
+
 def Example_Analysis(file_souji_fengzhong,stock_number):
     global local_date_4_file
 
@@ -43,8 +53,6 @@ def Example_Analysis(file_souji_fengzhong,stock_number):
         wav_file_up="C:\\Windows\\Media\\StarWar_force.wav"
         wav_file_down="C:\\Windows\\Media\\StarWar_nuclear.wav"
 
-    spk = win32com.client.Dispatch("SAPI.SpVoice")
-
     file_result_example="C:\\IBM-9\\FTNN_HK\\Analysis_out_example"+"_"+market_name+"_"+stock_number+"_"+local_date_4_file+".csv"
 
     if os.path.exists(file_result_example)==False:
@@ -63,9 +71,11 @@ def Example_Analysis(file_souji_fengzhong,stock_number):
             #last_line_data.ix[0,7] > last_line_data.ix[0,8] :
             if stock_number==stock_number_1 or stock_number==stock_number_2:
                 speak_str=stock_number+" UP"
-                spk.Speak(speak_str)
+                p1 = multiprocessing.Process(target = speak_string, args = (speak_str,))
+                p1.start()
             else:
-                winsound.PlaySound(wav_file_up, winsound.SND_NODEFAULT)
+                p2 = multiprocessing.Process(target = play_wav_sound, args = (wav_file_up,))
+                p2.start()
 
             f=open(file_result_example,"a")
             print >>f,"Up,"+str(list(last_line_data.ix[:,0]).pop())+","\
@@ -83,9 +93,11 @@ def Example_Analysis(file_souji_fengzhong,stock_number):
 
             if stock_number==stock_number_1 or stock_number==stock_number_2:
                 speak_str=stock_number+" DOWN"
-                spk.Speak(speak_str)
+                p1 = multiprocessing.Process(target = speak_string, args = (speak_str,))
+                p1.start()
             else:
-                winsound.PlaySound(wav_file_down, winsound.SND_NODEFAULT)
+                p2 = multiprocessing.Process(target = play_wav_sound, args = (wav_file_down,))
+                p2.start()
 
             f=open(file_result_example,"a")
             print >>f,"Down,"+str(list(last_line_data.ix[:,0]).pop())+","\
@@ -379,104 +391,53 @@ def GetValue(req,stock_number):
 
     return temp_LastHour,temp_LastMinute
 
-#1 = 港股
-#2 = 美股
-#3 = 沪股
-#4 = 深股
-which_market='4'
-stock_number_1='000333'
-stock_number_2='002672'
-if which_market=="1":
-    market_name="hk"
-    market_index_number='800000'
-elif which_market=="2":
-    market_name="us"
-    market_index_number='DJI'
-elif which_market=="3":
-    market_name="sh"
-    market_index_number='000001'
-elif which_market=="4":
-    market_name="sz"
-    market_index_number='399001'
-else:
-    market_name="XX"
-
-# 上一分钟信息
-LastMinute=None
-LastTradeOrderTime=None
-
-#local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
-local_date_4_file=time.strftime('%Y%m%d',time.localtime(time.time()-24*60*60))
-
-df_4=pd.DataFrame()
-df_5=pd.DataFrame()
-df_6=pd.DataFrame()
-
-#futnn plubin会开启本地监听服务端
-# 请求及发送数据都是jason格式, 具体详见插件的协议文档
-host="localhost"
-port=11111
-
-local_date=time.strftime('%Y-%m-%d',time.localtime(time.time()-24*60*60))
-
-s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-s.connect((host,port))
-
-#需要确认电脑时区是香港时区
-now_time=time.localtime(time.time()-24*60*60)
-if which_market=='1'or  which_market=='3' or  which_market=='4':
-    if (now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
-        now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S")) or \
-        (now_time>time.strptime(local_date+" "+"13:00:00", "%Y-%m-%d %H:%M:%S") and \
-        now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S")):
-        in_time_range=1
+if __name__ == '__main__':
+    #1 = 港股
+    #2 = 美股
+    #3 = 沪股
+    #4 = 深股
+    which_market='2'
+    stock_number_1='ASHR'
+    stock_number_2='CHAD'
+    if which_market=="1":
+        market_name="hk"
+        market_index_number='800000'
+    elif which_market=="2":
+        market_name="us"
+        market_index_number='DJI'
+    elif which_market=="3":
+        market_name="sh"
+        market_index_number='000001'
+    elif which_market=="4":
+        market_name="sz"
+        market_index_number='399001'
     else:
-        in_time_range=0
-elif which_market=='2':
-    if now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
-        now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S"):
-        in_time_range=2
-    else:
-        in_time_range=0
-elif which_market=='3' or  which_market=='4':
-    if (now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
-        now_time<time.strptime(local_date+" "+"11:30:01", "%Y-%m-%d %H:%M:%S")) or \
-        (now_time>time.strptime(local_date+" "+"13:00:00", "%Y-%m-%d %H:%M:%S") and \
-        now_time<time.strptime(local_date+" "+"15:00:01", "%Y-%m-%d %H:%M:%S")):
-        in_time_range=1
-    else:
-        in_time_range=0
-else:
-    in_time_range=0
+        market_name="XX"
 
-while in_time_range>0:
-    actual_second=time.strftime("%S",now_time)
-    if int(actual_second)>-1:
-        #发送报价请求，Market为2表示是美股
-        #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
-        stock_number=stock_number_1
-        req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':stock_number},'Version':'1'}
-        #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
-        #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'01585'},'Version':'1'}
-        temp_LastHour,temp_LastMinute=GetValue(req,stock_number)
+    # 上一分钟信息
+    LastMinute=None
+    LastTradeOrderTime=None
 
-        stock_number=stock_number_2
-        req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':stock_number},'Version':'1'}
-        temp_LastHour,temp_LastMinute=GetValue(req,stock_number)
+    #local_date_4_file=time.strftime('%Y%m%d_%H%M%S',time.localtime(time.time()-24*60*60))
+    local_date_4_file=time.strftime('%Y%m%d',time.localtime(time.time()-24*60*60))
 
-        if which_market==str(1) or which_market==str(3) or which_market==str(4) :
-            req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':market_index_number},'Version':'1'}
-        #美国股指在富途中是以.(点)开头
-        elif which_market==str(2):
-            req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':'.'+market_index_number},'Version':'1'}
-        stock_number=market_index_number
-        temp_LastHour,temp_LastMinute=GetValue(req,stock_number)
-        #使用指数查询时间作为本次交易（一次交易包括查询一次股票，一次指数）的最新时间
-        LastHour=temp_LastHour
-        LastMinute=temp_LastMinute
+    df_4=pd.DataFrame()
+    df_5=pd.DataFrame()
+    df_6=pd.DataFrame()
 
+    #futnn plubin会开启本地监听服务端
+    # 请求及发送数据都是jason格式, 具体详见插件的协议文档
+    host="localhost"
+    port=11111
+
+    local_date=time.strftime('%Y-%m-%d',time.localtime(time.time()-24*60*60))
+
+    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.connect((host,port))
+
+    #需要确认电脑时区是香港时区
     now_time=time.localtime(time.time()-24*60*60)
-    if which_market=='1' or  which_market=='3' or  which_market=='4':
+    if which_market=='1':
         if (now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
             now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S")) or \
             (now_time>time.strptime(local_date+" "+"13:00:00", "%Y-%m-%d %H:%M:%S") and \
@@ -500,4 +461,56 @@ while in_time_range>0:
             in_time_range=0
     else:
         in_time_range=0
+
+    while in_time_range>0:
+        actual_second=time.strftime("%S",now_time)
+        if int(actual_second)>-1:
+            #发送报价请求，Market为2表示是美股
+            #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
+            stock_number=stock_number_1
+            req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':stock_number},'Version':'1'}
+            #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'00700'},'Version':'1'}
+            #req = {'Protocol':'1001', 'ReqParam':{'Market':'1','StockCode':'01585'},'Version':'1'}
+            temp_LastHour,temp_LastMinute=GetValue(req,stock_number)
+
+            stock_number=stock_number_2
+            req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':stock_number},'Version':'1'}
+            temp_LastHour,temp_LastMinute=GetValue(req,stock_number)
+
+            if which_market==str(1) or which_market==str(3) or which_market==str(4) :
+                req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':market_index_number},'Version':'1'}
+            #美国股指在富途中是以.(点)开头
+            elif which_market==str(2):
+                req = {'Protocol':'1001', 'ReqParam':{'Market':which_market,'StockCode':'.'+market_index_number},'Version':'1'}
+            stock_number=market_index_number
+            temp_LastHour,temp_LastMinute=GetValue(req,stock_number)
+            #使用指数查询时间作为本次交易（一次交易包括查询一次股票，一次指数）的最新时间
+            LastHour=temp_LastHour
+            LastMinute=temp_LastMinute
+
+        now_time=time.localtime(time.time()-24*60*60)
+        if which_market=='1':
+            if (now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
+                now_time<time.strptime(local_date+" "+"12:00:01", "%Y-%m-%d %H:%M:%S")) or \
+                (now_time>time.strptime(local_date+" "+"13:00:00", "%Y-%m-%d %H:%M:%S") and \
+                now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S")):
+                in_time_range=1
+            else:
+                in_time_range=0
+        elif which_market=='2':
+            if now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
+                now_time<time.strptime(local_date+" "+"16:00:01", "%Y-%m-%d %H:%M:%S"):
+                in_time_range=2
+            else:
+                in_time_range=0
+        elif which_market=='3' or  which_market=='4':
+            if (now_time>time.strptime(local_date+" "+"9:30:00", "%Y-%m-%d %H:%M:%S") and \
+                now_time<time.strptime(local_date+" "+"11:30:01", "%Y-%m-%d %H:%M:%S")) or \
+                (now_time>time.strptime(local_date+" "+"13:00:00", "%Y-%m-%d %H:%M:%S") and \
+                now_time<time.strptime(local_date+" "+"15:00:01", "%Y-%m-%d %H:%M:%S")):
+                in_time_range=1
+            else:
+                in_time_range=0
+        else:
+            in_time_range=0
 
