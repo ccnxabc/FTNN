@@ -1,0 +1,557 @@
+# coding=utf-8
+
+#Error in Reading a csv file in pandas[CParserError: Error tokenizing data. C error: Buffer overflow caught - possible malformed input file.]
+#如果出现上述错误，第一看下dataframe格式是否完整，不缺不多；第二将csv文件用excel打开再另存为csv
+
+import time
+import datetime
+local_date=time.strftime('%Y-%m-%d',time.localtime(time.time()-24*60*60))
+
+import pandas as pd
+import pandas.io.data as web
+
+import requests
+
+#设计近3年数据回溯
+year_analysis_number=3
+
+def Write_2_html(*x):
+
+    #(写入文件名,标题,X横坐标,Y1变量名，Y1变量值，Y2变量名，Y2变量值......   ）
+
+    write_2_html_part_1="""
+    <!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <title>ECharts</title>
+    </head>
+    <body>
+        <div id="main" style="height:700px"></div>
+        <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+        <script type="text/javascript">
+    """
+
+    #写入内容到html的文件路径
+    write_2_html_filepath=x[1]
+    f=open(write_2_html_filepath,'w')
+    print >>f,write_2_html_part_1
+
+    #标题
+    title_str=x[1]
+
+    #横坐标:日期
+    Date_A = x[2]
+
+    print >>f,'Date_A=',Date_A
+    print >>f,'Latest_Date=',title_str
+    print >>f,'\n'
+
+    #有多少Y变量?
+    Y_var_number=(len(x)-3)/2
+
+    #输出变量名称
+    for i in range(0,Y_var_number):
+        print >>f,'var_%s'%i,'=',x[3+2*i+1-1]
+
+    print >>f,'\n'
+
+    #列数不要跟输出的xls文件相混淆了，这里取的是程序中的变量数值
+    #这里的Data_All是告诉总共有多少Y变量，后续将用到
+    Data_All='['
+    for i in range(0,Y_var_number):
+        Data_All=Data_All+'var_'+str(i)+','
+        if i==int(Y_var_number/2)-1:
+            Data_All=Data_All+'\'\','
+
+    Data_All=Data_All+']'
+
+    #输出变量值
+    for i in range(0,Y_var_number):
+        print >>f,'var_%s'%i,'=',x[3+2*i+2-1]
+
+    print >>f,'\n'
+
+    write_2_html_part_3="""
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+
+        require(
+            [
+                'echarts',
+                'echarts/chart/line'
+            ],
+            function (ec) {
+                var myChart = ec.init(document.getElementById('main'));
+
+                var option = {
+    tooltip : {
+        trigger: 'axis'
+    },
+    title : {
+        text: Latest_Date
+    },
+    legend: {
+    """
+
+    print >>f,write_2_html_part_3
+
+    print >>f,' data:',Data_All
+
+    write_2_html_part_5="""
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                boundaryGap : false,
+                  data : Date_A
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value'
+            }
+        ],
+        series : [
+    """
+    print >>f,write_2_html_part_5
+
+    for i in range(0,Y_var_number):
+        print >>f,'        {'
+        print >>f,'            name:var_%s,'%i
+        print >>f,'            type:\'line\','
+        print >>f,'            stack: \'USD\','
+        print >>f,'            data:data_%s'%i
+        print >>f,'        },'
+
+    write_2_html_part_7="""
+        ]
+    };
+
+                    myChart.setOption(option);
+                }
+            );
+        </script>
+    </body>
+    """
+    print >>f,write_2_html_part_7
+    f.close()
+
+
+
+
+
+    
+
+def GetValue(stock_name,symbol,filepath,analysis_filepath):
+    global year_analysis_number
+    data_sina=requests.get('http://hq.sinajs.cn/list='+symbol)
+    if symbol.find('sh') >= 0 or symbol.find('sz') >= 0:
+        data_stock=data_sina.text.split(',')
+        data_stock_Open=data_stock[1]
+        data_stock_Close=data_stock[3]
+        data_stock_High=data_stock[4]
+        data_stock_Low=data_stock[5]
+        data_stock_Date=data_stock[30]
+        data_stock_volume=data_stock[8]
+
+        month=str(data_stock[30]).split("-")[1]
+        day=str(data_stock[30]).split("-")[2]
+        year=time.strftime('%Y')
+
+        stock_date_string=" "+year+"/"+month+"/"+day
+        stock_date=time.strptime(stock_date_string," %Y/%m/%d")
+
+        df=pd.read_csv(filepath)
+        former_day=time.strptime(df.tail(1).ix[:,0].max()," %Y/%m/%d")
+        former_close=df.tail(1).ix[:,4].max()
+
+    elif symbol.find('hk') >= 0:
+        data_stock=data_sina.text.split(',')
+        data_stock_Open=data_stock[2]
+        data_stock_Close=data_stock[6]
+        data_stock_High=data_stock[4]
+        data_stock_Low=data_stock[5]
+        data_stock_Date=data_stock[17]
+        data_stock_volume=str(int(data_stock[12])/100)
+
+        month=str(data_stock_Date).split("/")[1]
+        day=str(data_stock_Date).split("/")[2]
+        year=time.strftime('%Y')
+
+        stock_date_string=" "+year+"/"+month+"/"+day
+        ##注意这里为了下面的香港变态数据格式保持一致，故意多了一个空格！
+        stock_date=time.strptime(stock_date_string," %Y/%m/%d")
+
+        df=pd.read_csv(filepath)
+        #注意这里香港数据变态得多了一个空格！
+        former_day=time.strptime(df.tail(1).ix[:,0].max()," %Y/%m/%d")
+        former_close=df.tail(1).ix[:,4].max()
+
+    if former_day!=stock_date:
+        today_percent=( float(data_stock_Close)-float(former_close) )/float(former_close)
+        #c2=stock_date_string+','+data_stock_Open+','+data_stock_High+','+data_stock_Low+','+data_stock_Close+','+data_stock_volume+','+str(today_percent)+'\r'
+        #针对通达信格式，否则使用UltraEdit可以看到奇怪的格式！
+        c2=stock_date_string+','+data_stock_Open+','+data_stock_High+','+data_stock_Low+','+data_stock_Close+','+data_stock_volume+','+str(today_percent)+'\n'
+
+        f=open(filepath,"a")
+        f.write(c2)
+        f.close()
+
+    #计算每天到初始值的涨幅
+    df=pd.read_csv(filepath)
+    df.index=pd.tseries.index.DatetimeIndex(df.ix[:,0])
+    #计算累计涨幅
+    today_percent_position=6
+    df['1+x%']=df.ix[:,today_percent_position]+1
+    #这里计算近3年的涨幅，因为现在是2016年，则计算2016（基准值是2015最后一天)，2015（基准值是2014最后一天)，2014（基准值是2013最后一天)到现在的累计涨幅
+
+    to_now_ZhangFu='_2now_ZhangFu'
+    for tmp in range(0,year_analysis_number):
+        #因为1月1日香港美国大陆均放假，因此这个>xxxx年1月1日肯定包含了所有的交易日数据
+        #使用累计乘积cumprod()
+        df[str(int(year)-tmp)+to_now_ZhangFu]=df[df.index>datetime.datetime(int(year)-tmp,1,1)].ix[:,today_percent_position+1].cumprod()
+
+    df.to_csv(analysis_filepath,index=False)
+
+
+
+def Merge_data(stock_name,A_filepath,HK_filepath,merge_filepath):
+    global year_analysis_number
+
+    A_df=pd.read_csv(A_filepath)
+    A_df.index=pd.tseries.index.DatetimeIndex(A_df.ix[:,0])
+
+    HK_df=pd.read_csv(HK_filepath)
+    HK_df.index=pd.tseries.index.DatetimeIndex(HK_df.ix[:,0])
+
+    df=pd.merge(A_df,HK_df,left_index=True,right_index=True,how='inner')
+
+    to_now_ZhangFu='_2now_ZhangFu'
+    year=time.strftime('%Y')
+    last_year_ZhangFu_position=8
+
+    for tmp in range(0,year_analysis_number):
+        #Date_x	O_x	H_x	L_x	C_x	Volume_x	today_percent  1+x%  2016_2now_ZhangFu_x	2015_2now_ZhangFu_x	2014_2now_ZhangFu_x	Date_y	O_y	H_y	L_y	C_y	Volume_y	today_ZhangFu	2016_2now_ZhangFu_y	2015_2now_ZhangFu_y	2014_2now_ZhangFu_y
+        df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]=df.ix[:,last_year_ZhangFu_position+tmp]-df.ix[:,last_year_ZhangFu_position+(year_analysis_number-1)+(last_year_ZhangFu_position+1)+tmp]
+    df.to_csv(merge_filepath,index=False)
+
+Base_path="C:\\IBM-9\\A_HK_XiangGuan\\"
+
+#东江环保
+DJHB_A_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\A.csv"
+DJHB_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\A_analysis.csv"
+DJHB_HK_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\HK.csv"
+DJHB_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\HK_analysis.csv"
+DJHB_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\Merge.csv"
+DJHB_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\Visual.html"
+GetValue('DJHB','sz002672',DJHB_A_filepath, DJHB_A_analysis_filepath)
+GetValue('DJHB','hk00895', DJHB_HK_filepath,DJHB_HK_analysis_filepath)
+Merge_data('DJHB',DJHB_A_analysis_filepath,DJHB_HK_analysis_filepath,DJHB_HK_merge_filepath)
+Write_2_html(DJHB_2_html_filepath,title_str,Date_X_axis,'2016')
+
+    #(写入文件名,标题,X横坐标,Y1变量名，Y1变量值，Y2变量名，Y2变量值......   ）
+
+
+
+#建设银行
+JSYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\JSYH\A.csv"
+JSYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\JSYH\A_analysis.csv"
+JSYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\JSYH\HK.csv"
+JSYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\JSYH\HK_analysis.csv"
+JSYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\JSYH\Merge.csv"
+GetValue('JSYH','sh601939',JSYH_A_filepath, JSYH_A_analysis_filepath)
+GetValue('JSYH','hk00939', JSYH_HK_filepath,JSYH_HK_analysis_filepath)
+Merge_data('JSYH',JSYH_A_analysis_filepath,JSYH_HK_analysis_filepath,JSYH_HK_merge_filepath)
+
+#中集集团
+ZJJT_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\A.csv"
+ZJJT_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\A_analysis.csv"
+ZJJT_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\HK.csv"
+ZJJT_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\HK_analysis.csv"
+ZJJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\Merge.csv"
+GetValue('ZJJT','sz000039',ZJJT_A_filepath, ZJJT_A_analysis_filepath)
+GetValue('ZJJT','hk02039', ZJJT_HK_filepath,ZJJT_HK_analysis_filepath)
+Merge_data('ZJJT',ZJJT_A_analysis_filepath,ZJJT_HK_analysis_filepath,ZJJT_HK_merge_filepath)
+
+#中联重科
+ZLZK_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\A.csv"
+ZLZK_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\A_analysis.csv"
+ZLZK_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\HK.csv"
+ZLZK_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\HK_analysis.csv"
+ZLZK_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\Merge.csv"
+GetValue('ZLZK','sz000157',ZLZK_A_filepath, ZLZK_A_analysis_filepath)
+GetValue('ZLZK','hk01157', ZLZK_HK_filepath,ZLZK_HK_analysis_filepath)
+Merge_data('ZLZK',ZLZK_A_analysis_filepath,ZLZK_HK_analysis_filepath,ZLZK_HK_merge_filepath)
+
+#东北电气
+DBDQ_A_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\A.csv"
+DBDQ_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\A_analysis.csv"
+DBDQ_HK_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\HK.csv"
+DBDQ_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\HK_analysis.csv"
+DBDQ_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\Merge.csv"
+GetValue('DBDQ','sz000585',DBDQ_A_filepath, DBDQ_A_analysis_filepath)
+GetValue('DBDQ','hk00042', DBDQ_HK_filepath,DBDQ_HK_analysis_filepath)
+Merge_data('DBDQ',DBDQ_A_analysis_filepath,DBDQ_HK_analysis_filepath,DBDQ_HK_merge_filepath)
+
+#海信科龙
+HXKL_A_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\A.csv"
+HXKL_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\A_analysis.csv"
+HXKL_HK_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\HK.csv"
+HXKL_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\HK_analysis.csv"
+HXKL_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\Merge.csv"
+GetValue('HXKL','sz000921',HXKL_A_filepath, HXKL_A_analysis_filepath)
+GetValue('HXKL','hk00921', HXKL_HK_filepath,HXKL_HK_analysis_filepath)
+Merge_data('HXKL',HXKL_A_analysis_filepath,HXKL_HK_analysis_filepath,HXKL_HK_merge_filepath)
+
+#新华制药
+XHZY_A_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\A.csv"
+XHZY_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\A_analysis.csv"
+XHZY_HK_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\HK.csv"
+XHZY_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\HK_analysis.csv"
+XHZY_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\Merge.csv"
+GetValue('XHZY','sz000756',XHZY_A_filepath, XHZY_A_analysis_filepath)
+GetValue('XHZY','hk00719', XHZY_HK_filepath,XHZY_HK_analysis_filepath)
+Merge_data('XHZY',XHZY_A_analysis_filepath,XHZY_HK_analysis_filepath,XHZY_HK_merge_filepath)
+
+#山东墨龙
+SDML_A_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\A.csv"
+SDML_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\A_analysis.csv"
+SDML_HK_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\HK.csv"
+SDML_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\HK_analysis.csv"
+SDML_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\Merge.csv"
+GetValue('SDML','sz002490',SDML_A_filepath, SDML_A_analysis_filepath)
+GetValue('SDML','hk00568', SDML_HK_filepath,SDML_HK_analysis_filepath)
+Merge_data('SDML',SDML_A_analysis_filepath,SDML_HK_analysis_filepath,SDML_HK_merge_filepath)
+
+#浙江世宝
+ZJSB_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\A.csv"
+ZJSB_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\A_analysis.csv"
+ZJSB_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\HK.csv"
+ZJSB_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\HK_analysis.csv"
+ZJSB_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\Merge.csv"
+GetValue('ZJSB','sz002703',ZJSB_A_filepath, ZJSB_A_analysis_filepath)
+GetValue('ZJSB','hk01057', ZJSB_HK_filepath,ZJSB_HK_analysis_filepath)
+Merge_data('ZJSB',ZJSB_A_analysis_filepath,ZJSB_HK_analysis_filepath,ZJSB_HK_merge_filepath)
+
+
+#工商银行
+GSYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\A.csv"
+GSYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\A_analysis.csv"
+GSYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\HK.csv"
+GSYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\HK_analysis.csv"
+GSYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\Merge.csv"
+GetValue('GSYH','sh601398',GSYH_A_filepath, GSYH_A_analysis_filepath)
+GetValue('GSYH','hk01398', GSYH_HK_filepath,GSYH_HK_analysis_filepath)
+Merge_data('GSYH',GSYH_A_analysis_filepath,GSYH_HK_analysis_filepath,GSYH_HK_merge_filepath)
+
+#中国银行
+ZGYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\A.csv"
+ZGYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\A_analysis.csv"
+ZGYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\HK.csv"
+ZGYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\HK_analysis.csv"
+ZGYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\Merge.csv"
+GetValue('ZGYH','sh601988',ZGYH_A_filepath, ZGYH_A_analysis_filepath)
+GetValue('ZGYH','hk03988', ZGYH_HK_filepath,ZGYH_HK_analysis_filepath)
+Merge_data('ZGYH',ZGYH_A_analysis_filepath,ZGYH_HK_analysis_filepath,ZGYH_HK_merge_filepath)
+
+
+#交通银行
+JTYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\A.csv"
+JTYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\A_analysis.csv"
+JTYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\HK.csv"
+JTYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\HK_analysis.csv"
+JTYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\Merge.csv"
+GetValue('JTYH','sh601328',JTYH_A_filepath, JTYH_A_analysis_filepath)
+GetValue('JTYH','hk03328', JTYH_HK_filepath,JTYH_HK_analysis_filepath)
+Merge_data('JTYH',JTYH_A_analysis_filepath,JTYH_HK_analysis_filepath,JTYH_HK_merge_filepath)
+
+#民生银行
+MSYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\A.csv"
+MSYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\A_analysis.csv"
+MSYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\HK.csv"
+MSYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\HK_analysis.csv"
+MSYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\Merge.csv"
+GetValue('MSYH','sh600016',MSYH_A_filepath, MSYH_A_analysis_filepath)
+GetValue('MSYH','hk01988', MSYH_HK_filepath,MSYH_HK_analysis_filepath)
+Merge_data('MSYH',MSYH_A_analysis_filepath,MSYH_HK_analysis_filepath,MSYH_HK_merge_filepath)
+
+#中国太保
+ZGTB_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\A.csv"
+ZGTB_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\A_analysis.csv"
+ZGTB_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\HK.csv"
+ZGTB_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\HK_analysis.csv"
+ZGTB_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\Merge.csv"
+GetValue('ZGTB','sh601601',ZGTB_A_filepath, ZGTB_A_analysis_filepath)
+GetValue('ZGTB','hk02601', ZGTB_HK_filepath,ZGTB_HK_analysis_filepath)
+Merge_data('ZGTB',ZGTB_A_analysis_filepath,ZGTB_HK_analysis_filepath,ZGTB_HK_merge_filepath)
+
+#中国人寿
+ZGRS_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\A.csv"
+ZGRS_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\A_analysis.csv"
+ZGRS_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\HK.csv"
+ZGRS_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\HK_analysis.csv"
+ZGRS_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\Merge.csv"
+GetValue('ZGRS','sh601628',ZGRS_A_filepath, ZGRS_A_analysis_filepath)
+GetValue('ZGRS','hk02628', ZGRS_HK_filepath,ZGRS_HK_analysis_filepath)
+Merge_data('ZGRS',ZGRS_A_analysis_filepath,ZGRS_HK_analysis_filepath,ZGRS_HK_merge_filepath)
+
+#新华保险
+XHBX_A_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\A.csv"
+XHBX_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\A_analysis.csv"
+XHBX_HK_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\HK.csv"
+XHBX_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\HK_analysis.csv"
+XHBX_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\Merge.csv"
+GetValue('XHBX','sh601336',XHBX_A_filepath, XHBX_A_analysis_filepath)
+GetValue('XHBX','hk01336', XHBX_HK_filepath,XHBX_HK_analysis_filepath)
+Merge_data('XHBX',XHBX_A_analysis_filepath,XHBX_HK_analysis_filepath,XHBX_HK_merge_filepath)
+
+#广深铁路
+GSTL_A_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\A.csv"
+GSTL_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\A_analysis.csv"
+GSTL_HK_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\HK.csv"
+GSTL_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\HK_analysis.csv"
+GSTL_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\Merge.csv"
+GetValue('GSTL','sh601333',GSTL_A_filepath, GSTL_A_analysis_filepath)
+GetValue('GSTL','hk00525', GSTL_HK_filepath,GSTL_HK_analysis_filepath)
+Merge_data('GSTL',GSTL_A_analysis_filepath,GSTL_HK_analysis_filepath,GSTL_HK_merge_filepath)
+
+#中信银行
+ZXYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\A.csv"
+ZXYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\A_analysis.csv"
+ZXYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\HK.csv"
+ZXYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\HK_analysis.csv"
+ZXYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\Merge.csv"
+GetValue('ZXYH','sh601998',ZXYH_A_filepath, ZXYH_A_analysis_filepath)
+GetValue('ZXYH','hk00998', ZXYH_HK_filepath,ZXYH_HK_analysis_filepath)
+Merge_data('ZXYH',ZXYH_A_analysis_filepath,ZXYH_HK_analysis_filepath,ZXYH_HK_merge_filepath)
+
+
+#晨鸣纸业
+CMZY_A_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\A.csv"
+CMZY_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\A_analysis.csv"
+CMZY_HK_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\HK.csv"
+CMZY_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\HK_analysis.csv"
+CMZY_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\Merge.csv"
+GetValue('CMZY','sz000488',CMZY_A_filepath, CMZY_A_analysis_filepath)
+GetValue('CMZY','hk01812', CMZY_HK_filepath,CMZY_HK_analysis_filepath)
+Merge_data('CMZY',CMZY_A_analysis_filepath,CMZY_HK_analysis_filepath,CMZY_HK_merge_filepath)
+
+#金风科技
+JFKJ_A_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\A.csv"
+JFKJ_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\A_analysis.csv"
+JFKJ_HK_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\HK.csv"
+JFKJ_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\HK_analysis.csv"
+JFKJ_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\Merge.csv"
+GetValue('JFKJ','sz002202',JFKJ_A_filepath, JFKJ_A_analysis_filepath)
+GetValue('JFKJ','hk02208', JFKJ_HK_filepath,JFKJ_HK_analysis_filepath)
+Merge_data('JFKJ',JFKJ_A_analysis_filepath,JFKJ_HK_analysis_filepath,JFKJ_HK_merge_filepath)
+
+#中兴通讯
+ZXTX_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\A.csv"
+ZXTX_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\A_analysis.csv"
+ZXTX_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\HK.csv"
+ZXTX_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\HK_analysis.csv"
+ZXTX_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\Merge.csv"
+GetValue('ZXTX','sz000063',ZXTX_A_filepath, ZXTX_A_analysis_filepath)
+GetValue('ZXTX','hk00763', ZXTX_HK_filepath,ZXTX_HK_analysis_filepath)
+Merge_data('ZXTX',ZXTX_A_analysis_filepath,ZXTX_HK_analysis_filepath,ZXTX_HK_merge_filepath)
+
+
+
+
+
+NYYH_A_filepath="C:\\IBM-9\\A_HK_XiangGuan\\NYYH\\A.csv"
+NYYH_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\NYYH\A_analysis.csv"
+NYYH_HK_filepath="C:\IBM-9\A_HK_XiangGuan\NYYH\HK.csv"
+NYYH_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\NYYH\HK_analysis.csv"
+NYYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\NYYH\Merge.csv"
+GetValue('NYYH','sh601288',NYYH_A_filepath, NYYH_A_analysis_filepath)
+GetValue('NYYH','hk01288', NYYH_HK_filepath,NYYH_HK_analysis_filepath)
+Merge_data('NYYH',NYYH_A_analysis_filepath,NYYH_HK_analysis_filepath,NYYH_HK_merge_filepath)
+
+NHGS_A_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\A.csv"
+NHGS_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\A_analysis.csv"
+NHGS_HK_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\HK.csv"
+NHGS_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\HK_analysis.csv"
+NHGS_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\Merge.csv"
+GetValue('NHGS','sh600377',NHGS_A_filepath, NHGS_A_analysis_filepath)
+GetValue('NHGS','hk00177', NHGS_HK_filepath,NHGS_HK_analysis_filepath)
+Merge_data('NHGS',NHGS_A_analysis_filepath,NHGS_HK_analysis_filepath,NHGS_HK_merge_filepath)
+
+HLSN_A_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\A.csv"
+HLSN_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\A_analysis.csv"
+HLSN_HK_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\HK.csv"
+HLSN_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\HK_analysis.csv"
+HLSN_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\Merge.csv"
+GetValue('HLSN','sh600585',HLSN_A_filepath, HLSN_A_analysis_filepath)
+GetValue('HLSN','hk00914', HLSN_HK_filepath,HLSN_HK_analysis_filepath)
+Merge_data('HLSN',HLSN_A_analysis_filepath,HLSN_HK_analysis_filepath,HLSN_HK_merge_filepath)
+
+ZGPA_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\A.csv"
+ZGPA_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\A_analysis.csv"
+ZGPA_HK_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\HK.csv"
+ZGPA_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\HK_analysis.csv"
+ZGPA_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\Merge.csv"
+GetValue('ZGPA','sh601318',ZGPA_A_filepath, ZGPA_A_analysis_filepath)
+GetValue('ZGPA','hk02318', ZGPA_HK_filepath,ZGPA_HK_analysis_filepath)
+Merge_data('ZGPA',ZGPA_A_analysis_filepath,ZGPA_HK_analysis_filepath,ZGPA_HK_merge_filepath)
+
+GFZQ_A_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\A.csv"
+GFZQ_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\A_analysis.csv"
+GFZQ_HK_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\HK.csv"
+GFZQ_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\HK_analysis.csv"
+GFZQ_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\Merge.csv"
+GetValue('GFZQ','sz000776',GFZQ_A_filepath, GFZQ_A_analysis_filepath)
+GetValue('GFZQ','hk01776', GFZQ_HK_filepath,GFZQ_HK_analysis_filepath)
+Merge_data('GFZQ',GFZQ_A_analysis_filepath,GFZQ_HK_analysis_filepath,GFZQ_HK_merge_filepath)
+
+WCDL_A_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\A.csv"
+WCDL_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\A_analysis.csv"
+WCDL_HK_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\HK.csv"
+WCDL_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\HK_analysis.csv"
+WCDL_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\Merge.csv"
+GetValue('WCDL','sz000338',WCDL_A_filepath, WCDL_A_analysis_filepath)
+GetValue('WCDL','hk02338', WCDL_HK_filepath,WCDL_HK_analysis_filepath)
+Merge_data('WCDL',WCDL_A_analysis_filepath,WCDL_HK_analysis_filepath,WCDL_HK_merge_filepath)
+
+AGGF_A_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\A.csv"
+AGGF_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\A_analysis.csv"
+AGGF_HK_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\HK.csv"
+AGGF_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\HK_analysis.csv"
+AGGF_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\Merge.csv"
+GetValue('AGGF','sz000898',AGGF_A_filepath, AGGF_A_analysis_filepath)
+GetValue('AGGF','hk00347', AGGF_HK_filepath,AGGF_HK_analysis_filepath)
+Merge_data('AGGF',AGGF_A_analysis_filepath,AGGF_HK_analysis_filepath,AGGF_HK_merge_filepath)
+
+BYD_A_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\A.csv"
+BYD_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\A_analysis.csv"
+BYD_HK_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\HK.csv"
+BYD_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\HK_analysis.csv"
+BYD_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\Merge.csv"
+GetValue('BYD','sz002594',BYD_A_filepath, BYD_A_analysis_filepath)
+GetValue('BYD','hk01211', BYD_HK_filepath,BYD_HK_analysis_filepath)
+Merge_data('BYD',BYD_A_analysis_filepath,BYD_HK_analysis_filepath,BYD_HK_merge_filepath)
+
+LZJT_A_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\A.csv"
+LZJT_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\A_analysis.csv"
+LZJT_HK_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\HK.csv"
+LZJT_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\HK_analysis.csv"
+LZJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\Merge.csv"
+GetValue('LZJT','sz000513',LZJT_A_filepath, LZJT_A_analysis_filepath)
+GetValue('LZJT','hk01513', LZJT_HK_filepath,LZJT_HK_analysis_filepath)
+Merge_data('LZJT',LZJT_A_analysis_filepath,LZJT_HK_analysis_filepath,LZJT_HK_merge_filepath)
+
