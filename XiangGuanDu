@@ -32,7 +32,7 @@ def Write_2_html(*x):
     """
 
     #写入内容到html的文件路径
-    write_2_html_filepath=x[1]
+    write_2_html_filepath=x[0]
     f=open(write_2_html_filepath,'w')
     print >>f,write_2_html_part_1
 
@@ -67,7 +67,7 @@ def Write_2_html(*x):
 
     #输出变量值
     for i in range(0,Y_var_number):
-        print >>f,'var_%s'%i,'=',x[3+2*i+2-1]
+        print >>f,'data_%s'%i,'=',x[3+2*i+2-1]
 
     print >>f,'\n'
 
@@ -257,11 +257,28 @@ DJHB_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\A_analysis.csv"
 DJHB_HK_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\HK.csv"
 DJHB_HK_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\HK_analysis.csv"
 DJHB_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\Merge.csv"
-DJHB_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\Visual.html"
 GetValue('DJHB','sz002672',DJHB_A_filepath, DJHB_A_analysis_filepath)
 GetValue('DJHB','hk00895', DJHB_HK_filepath,DJHB_HK_analysis_filepath)
 Merge_data('DJHB',DJHB_A_analysis_filepath,DJHB_HK_analysis_filepath,DJHB_HK_merge_filepath)
-Write_2_html(DJHB_2_html_filepath,title_str,Date_X_axis,'2016')
+DJHB_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\Visual.html"
+df_temp=pd.read_csv(DJHB_HK_merge_filepath)
+df_temp.index=pd.tseries.index.DatetimeIndex(df_temp.ix[:,0])
+title_str='\'DJHB Latest Date:'+df_temp.tail(1).ix[:,0].max()+'\''
+#2014年以来的数据
+date_from_which_year=2014
+Date_X_axis=list(df_temp[df_temp.index>datetime.datetime(date_from_which_year,1,1)].ix[:,0])
+columns_len=len(df_temp.columns)
+Y1_name=df_temp.columns[columns_len-1]
+df_temp_2=df_temp.ix[:,columns_len-1]
+df_temp_2[df_temp_2.isnull()==True]=' '
+Y1_Value=list(df_temp_2[df_temp_2.index>datetime.datetime(date_from_which_year,1,1)].ix[:,0])
+
+Y2_name=df_temp.columns[columns_len-1-1]
+Y2_Value=list(df_temp[df_temp.index>datetime.datetime(2015,1,1)].ix[:,columns_len-1-1])
+
+Y3_name=df_temp.columns[columns_len-1-1-1]
+Y3_Value=list(df_temp[df_temp.index>datetime.datetime(2016,1,1)].ix[:,columns_len-1-1-1])
+Write_2_html(DJHB_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
     #(写入文件名,标题,X横坐标,Y1变量名，Y1变量值，Y2变量名，Y2变量值......   ）
 
@@ -554,4 +571,3 @@ LZJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\Merge.csv"
 GetValue('LZJT','sz000513',LZJT_A_filepath, LZJT_A_analysis_filepath)
 GetValue('LZJT','hk01513', LZJT_HK_filepath,LZJT_HK_analysis_filepath)
 Merge_data('LZJT',LZJT_A_analysis_filepath,LZJT_HK_analysis_filepath,LZJT_HK_merge_filepath)
-
