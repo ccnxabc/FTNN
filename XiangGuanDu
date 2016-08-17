@@ -15,6 +15,16 @@ import requests
 #设计近3年数据回溯
 year_analysis_number=3
 
+df_1_all=pd.DataFrame()
+df_2_all=pd.DataFrame()
+df_3_all=pd.DataFrame()
+
+Base_path="C:\\IBM-9\\A_HK_XiangGuan\\"
+
+df_1_all_path=Base_path+"df_1_all.csv"
+df_2_all_path=Base_path+"df_2_all.csv"
+df_3_all_path=Base_path+"df_3_all.csv"
+
 def Analysis_Var_2_display_in_html(stock_name,merge_filepath,date_from_which_year):
     df_temp=pd.read_csv(merge_filepath)
     df_temp.index=pd.tseries.index.DatetimeIndex(df_temp.ix[:,0])
@@ -182,7 +192,7 @@ def Write_2_html(*x):
 
 
 
-    
+
 
 def GetValue(stock_name,symbol,filepath,analysis_filepath):
     global year_analysis_number
@@ -260,6 +270,10 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
 def Merge_data(stock_name,A_filepath,HK_filepath,merge_filepath):
     global year_analysis_number
 
+    global df_1_all
+    global df_2_all
+    global df_3_all
+
     A_df=pd.read_csv(A_filepath)
     A_df.index=pd.tseries.index.DatetimeIndex(A_df.ix[:,0])
 
@@ -275,9 +289,31 @@ def Merge_data(stock_name,A_filepath,HK_filepath,merge_filepath):
     for tmp in range(0,year_analysis_number):
         #Date_x	O_x	H_x	L_x	C_x	Volume_x	today_percent  1+x%  2016_2now_ZhangFu_x	2015_2now_ZhangFu_x	2014_2now_ZhangFu_x	Date_y	O_y	H_y	L_y	C_y	Volume_y	today_ZhangFu	2016_2now_ZhangFu_y	2015_2now_ZhangFu_y	2014_2now_ZhangFu_y
         df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]=df.ix[:,last_year_ZhangFu_position+tmp]-df.ix[:,last_year_ZhangFu_position+(year_analysis_number-1)+(last_year_ZhangFu_position+1)+tmp]
+        #使用最原始暴力合并，即各个股票的最近3年（2016、2015、2014年）的统计数据整合在一起
+        if tmp==0:
+            if len(df_1_all)==0:
+                df_1_all=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]
+            else:
+                #df_1_all=pd.merge(df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu],left_index=True,right_index=True,how='outer')
+                df_1_all=pd.concat([df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]],axis=1)
+
+        if tmp==1:
+            if len(df_2_all)==0:
+                df_2_all=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]
+            else:
+                #df_2_all=pd.merge(df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu],left_index=True,right_index=True,how='outer')
+                df_2_all=pd.concat([df_2_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]],axis=1)
+
+        if tmp==2:
+            if len(df_3_all)==0:
+                df_3_all=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]
+            else:
+                #df_3_all=pd.merge(df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu],left_index=True,right_index=True,how='outer')
+                df_3_all=pd.concat([df_3_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]],axis=1)
     df.to_csv(merge_filepath,index=False)
 
-Base_path="C:\\IBM-9\\A_HK_XiangGuan\\"
+
+
 
 #东江环保
 DJHB_A_filepath="C:\IBM-9\A_HK_XiangGuan\DJHB\A.csv"
@@ -312,6 +348,8 @@ date_from_which_year=2014
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('JSYH',JSYH_HK_merge_filepath,date_from_which_year)
 Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
+
+
 #中集集团
 ZJJT_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\A.csv"
 ZJJT_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\A_analysis.csv"
@@ -321,6 +359,12 @@ ZJJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\Merge.csv"
 GetValue('ZJJT','sz000039',ZJJT_A_filepath, ZJJT_A_analysis_filepath)
 GetValue('ZJJT','hk02039', ZJJT_HK_filepath,ZJJT_HK_analysis_filepath)
 Merge_data('ZJJT',ZJJT_A_analysis_filepath,ZJJT_HK_analysis_filepath,ZJJT_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZJJT\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZJJT',ZJJT_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
+
 
 #中联重科
 ZLZK_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\A.csv"
@@ -331,6 +375,11 @@ ZLZK_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\Merge.csv"
 GetValue('ZLZK','sz000157',ZLZK_A_filepath, ZLZK_A_analysis_filepath)
 GetValue('ZLZK','hk01157', ZLZK_HK_filepath,ZLZK_HK_analysis_filepath)
 Merge_data('ZLZK',ZLZK_A_analysis_filepath,ZLZK_HK_analysis_filepath,ZLZK_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZLZK\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZLZK',ZLZK_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #东北电气
 DBDQ_A_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\A.csv"
@@ -341,6 +390,24 @@ DBDQ_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\Merge.csv"
 GetValue('DBDQ','sz000585',DBDQ_A_filepath, DBDQ_A_analysis_filepath)
 GetValue('DBDQ','hk00042', DBDQ_HK_filepath,DBDQ_HK_analysis_filepath)
 Merge_data('DBDQ',DBDQ_A_analysis_filepath,DBDQ_HK_analysis_filepath,DBDQ_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('DBDQ',DBDQ_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
+
+#测试后应该放在源码最后面
+Top_N=3
+n=len(df_1_all)
+df_1_all=df_1_all.T.sort_index(by=df_1_all.index[n-1]).tail(Top_N).T
+df_1_all.to_csv(df_1_all_path)
+
+df_2_all.to_csv(df_2_all_path)
+df_3_all.to_csv(df_3_all_path)
+
+#根据最后一行的累计操作结果对列进行排序，这个可以按需抽取出需要的TOP N来输出
+#df_GenZhang_JiaQiang=df_GenZhang_JiaQiang.T.sort_index(by=n-1).T
+
 
 #海信科龙
 HXKL_A_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\A.csv"
@@ -589,4 +656,3 @@ LZJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\Merge.csv"
 GetValue('LZJT','sz000513',LZJT_A_filepath, LZJT_A_analysis_filepath)
 GetValue('LZJT','hk01513', LZJT_HK_filepath,LZJT_HK_analysis_filepath)
 Merge_data('LZJT',LZJT_A_analysis_filepath,LZJT_HK_analysis_filepath,LZJT_HK_merge_filepath)
-
