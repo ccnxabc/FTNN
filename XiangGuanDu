@@ -36,43 +36,64 @@ def Analysis_Top10_Var_2_display_in_html(all_data_filepath,date_from_which_year)
 
     Y1_name=df_temp.columns[columns_len-1]
     df_temp_2=df_temp.ix[:,columns_len-1]
+    #之前已经对NAN使用了ffill的填充，这里是对一开始就是NAN的替代，将其数值为空
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y1_Value=str(list(df_temp_2))
+    Y1_Value=Y1_Value.replace('\'','')
 
     Y2_name=df_temp.columns[columns_len-2]
     df_temp_2=df_temp.ix[:,columns_len-2]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y2_Value=str(list(df_temp_2))
+    Y2_Value=Y2_Value.replace('\'','')
 
     Y3_name=df_temp.columns[columns_len-3]
     df_temp_2=df_temp.ix[:,columns_len-3]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y3_Value=str(list(df_temp_2))
+    Y3_Value=Y3_Value.replace('\'','')
 
     Y4_name=df_temp.columns[columns_len-4]
     df_temp_2=df_temp.ix[:,columns_len-4]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y4_Value=str(list(df_temp_2))
+    Y4_Value=Y4_Value.replace('\'','')
 
     Y5_name=df_temp.columns[columns_len-5]
     df_temp_2=df_temp.ix[:,columns_len-5]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y5_Value=str(list(df_temp_2))
+    Y5_Value=Y5_Value.replace('\'','')
 
     Y6_name=df_temp.columns[columns_len-6]
     df_temp_2=df_temp.ix[:,columns_len-6]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y6_Value=str(list(df_temp_2))
+    Y6_Value=Y6_Value.replace('\'','')
 
     Y7_name=df_temp.columns[columns_len-7]
     df_temp_2=df_temp.ix[:,columns_len-7]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y7_Value=str(list(df_temp_2))
+    Y7_Value=Y7_Value.replace('\'','')
 
     Y8_name=df_temp.columns[columns_len-8]
     df_temp_2=df_temp.ix[:,columns_len-8]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y8_Value=str(list(df_temp_2))
+    Y8_Value=Y8_Value.replace('\'','')
 
     Y9_name=df_temp.columns[columns_len-9]
     df_temp_2=df_temp.ix[:,columns_len-9]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y9_Value=str(list(df_temp_2))
+    Y9_Value=Y9_Value.replace('\'','')
 
     Y10_name=df_temp.columns[columns_len-10]
     df_temp_2=df_temp.ix[:,columns_len-10]
+    df_temp_2[df_temp_2.isnull()==True]=' '
     Y10_Value=str(list(df_temp_2))
+    Y10_Value=Y10_Value.replace('\'','')
 
     return title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value
@@ -92,14 +113,15 @@ def Analysis_Var_2_display_in_html(stock_name,merge_filepath,date_from_which_yea
     Y1_Value=str(list(df_temp_2[df_temp_2.index>datetime.datetime(date_from_which_year,1,1)]))
     Y1_Value=Y1_Value.replace('\'','')
 
-    Y2_name=df_temp.columns[columns_len-1-1]
-    df_temp_2=df_temp.ix[:,columns_len-1-1]
+    #格式变成了2016涨幅，2016涨幅Z分数，2015涨幅，2015涨幅Z分数，2014涨幅，2014涨幅Z分数，
+    Y2_name=df_temp.columns[columns_len-1-2]
+    df_temp_2=df_temp.ix[:,columns_len-1-2]
     df_temp_2[df_temp_2.isnull()==True]=' '
     Y2_Value=str(list(df_temp_2[df_temp_2.index>datetime.datetime(date_from_which_year,1,1)]))
     Y2_Value=Y2_Value.replace('\'','')
 
-    Y3_name=df_temp.columns[columns_len-1-1-1]
-    df_temp_2=df_temp.ix[:,columns_len-1-1-1]
+    Y3_name=df_temp.columns[columns_len-1-2-2]
+    df_temp_2=df_temp.ix[:,columns_len-1-2-2]
     df_temp_2[df_temp_2.isnull()==True]=' '
     Y3_Value=str(list(df_temp_2[df_temp_2.index>datetime.datetime(date_from_which_year,1,1)]))
     Y3_Value=Y3_Value.replace('\'','')
@@ -133,6 +155,7 @@ def Write_2_html(*x):
 
     #横坐标:日期
     Date_A = x[2]
+    xAxis_last_day=Date_A[-1]
 
     print >>f,'Date_A=',Date_A
     print >>f,'Latest_Date=',title_str
@@ -141,9 +164,12 @@ def Write_2_html(*x):
     #有多少Y变量?
     Y_var_number=(len(x)-3)/2
 
+    Z_Score_tag=0
     #输出变量名称
     for i in range(0,Y_var_number):
         print >>f,'var_%s'%i,'=','\'',x[3+2*i+1-1],'\''
+        if "Z_Score" in x[3+2*i+1-1]:
+            Z_Score_tag=1
 
     print >>f,'\n'
 
@@ -204,6 +230,12 @@ def Write_2_html(*x):
                 saveAsImage : {show: true}
             }
         },
+        dataZoom : {
+        show : true,
+        realtime: true,
+        start : 0,
+        end : 100
+        },
         calculable : true,
         xAxis : [
             {
@@ -222,12 +254,27 @@ def Write_2_html(*x):
     print >>f,write_2_html_part_5
 
     for i in range(0,Y_var_number):
-        print >>f,'        {'
-        print >>f,'            name:var_%s,'%i
-        print >>f,'            type:\'line\','
-        print >>f,'            stack: \'USD\','
-        print >>f,'            data:data_%s'%i
-        print >>f,'        },'
+        if i==0 and Z_Score_tag==1:
+            print >>f,'        {'
+            print >>f,'            name:var_%s,'%i
+            print >>f,'            type:\'line\','
+            print >>f,'            tiled: \'USD\','
+            print >>f,'            data:data_%s,'%i
+            print >>f,'            markLine:{'
+            print >>f,'                      data:['
+            print >>f,'                             [{name: \'Z_Score=1 Start\', value:1,xAxis: 0, yAxis: 1},{name: \'Z_Score=1 End\', xAxis:\'%s\',yAxis: 1}],'%xAxis_last_day
+            print >>f,'                             [{name: \'Z_Score=-1 Start\',  value:-1,xAxis: 0, yAxis: -1},{name: \'Z_Score=-1 End\', xAxis:\'%s\',yAxis: -1}]'%xAxis_last_day
+            print >>f,'                           ],'
+            print >>f,'                      }'
+            print >>f,'        },'
+        else:
+            print >>f,'        {'
+            print >>f,'            name:var_%s,'%i
+            print >>f,'            type:\'line\','
+            print >>f,'            tiled: \'USD\','
+            print >>f,'            data:data_%s'%i
+            print >>f,'        },'
+
 
     write_2_html_part_7="""
         ]
@@ -335,7 +382,7 @@ def Merge_data(stock_name,A_filepath,HK_filepath,merge_filepath):
     df=pd.merge(A_df,HK_df,left_index=True,right_index=True,how='inner')
 
     to_now_ZhangFu='_2now_ZhangFu'
-    to_now_ZhangFu_pairtrade='_2now_ZhangFu_pairtrade'
+    to_now_ZhangFu_pairtrade='_2now_ZhangFu_Z_Score'
     year=time.strftime('%Y')
     last_year_ZhangFu_position=8
 
@@ -715,16 +762,14 @@ df_3_all.to_csv("c:\9\df_3_all.csv")
 
 Top_N=10
 
+#如果前面有数值，然后碰到停牌什么的，可以使用之前的数据来替代NAN，这是可以说的过去的
+#但是对于一开始就是NAN的，建议取值为空更能反映问题
 df_1_all=df_1_all.fillna(method='ffill')
 df_2_all=df_2_all.fillna(method='ffill')
 df_3_all=df_3_all.fillna(method='ffill')
 
-df_1_all=df_1_all.fillna(method='bfill')
-df_2_all=df_2_all.fillna(method='bfill')
-df_3_all=df_3_all.fillna(method='bfill')
-
 n=len(df_1_all)
-df_1_all=df_1_all.T.sort_index(by=df_1_all.index[n-1]).tail(Top_N).T
+df_1_all=df_1_all.T.sort_index(by=df_1_all.index[n-1]).head(Top_N).T
 df_1_all.to_csv(df_1_all_path)
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
 Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_1_all_path,2016)
@@ -733,7 +778,7 @@ Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y
              Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
 
 n=len(df_2_all)
-df_2_all=df_2_all.T.sort_index(by=df_2_all.index[n-1]).tail(Top_N).T
+df_2_all=df_2_all.T.sort_index(by=df_2_all.index[n-1]).head(Top_N).T
 df_2_all.to_csv(df_2_all_path)
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
 Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_2_all_path,2015)
@@ -742,10 +787,10 @@ Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y
              Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
 
 n=len(df_3_all)
-df_3_all=df_3_all.T.sort_index(by=df_3_all.index[n-1]).tail(Top_N).T
+df_3_all=df_3_all.T.sort_index(by=df_3_all.index[n-1]).head(Top_N).T
 df_3_all.to_csv(df_3_all_path)
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
 Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_3_all_path,2014)
 write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_3_all.html"
 Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
-             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
