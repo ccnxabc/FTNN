@@ -7,6 +7,7 @@ import time
 import datetime
 local_date=time.strftime('%Y-%m-%d',time.localtime(time.time()-24*60*60))
 
+import numpy as np
 import pandas as pd
 import pandas.io.data as web
 
@@ -24,6 +25,59 @@ Base_path="C:\\IBM-9\\A_HK_XiangGuan\\"
 df_1_all_path=Base_path+"df_1_all.csv"
 df_2_all_path=Base_path+"df_2_all.csv"
 df_3_all_path=Base_path+"df_3_all.csv"
+
+def Analysis_Top10_Var_2_display_in_html(all_data_filepath,date_from_which_year):
+    df_temp=pd.read_csv(all_data_filepath)
+    df_temp.index=pd.tseries.index.DatetimeIndex(df_temp.ix[:,0])
+    title_str='\''+'From '+str(date_from_which_year)+': Latest Date:'+df_temp.tail(1).ix[:,0].max()+'\''
+
+    Date_X_axis=list(df_temp[df_temp.index>datetime.datetime(date_from_which_year,1,1)].ix[:,0])
+    columns_len=len(df_temp.columns)
+
+    Y1_name=df_temp.columns[columns_len-1]
+    df_temp_2=df_temp.ix[:,columns_len-1]
+    Y1_Value=str(list(df_temp_2))
+
+    Y2_name=df_temp.columns[columns_len-2]
+    df_temp_2=df_temp.ix[:,columns_len-2]
+    Y2_Value=str(list(df_temp_2))
+
+    Y3_name=df_temp.columns[columns_len-3]
+    df_temp_2=df_temp.ix[:,columns_len-3]
+    Y3_Value=str(list(df_temp_2))
+
+    Y4_name=df_temp.columns[columns_len-4]
+    df_temp_2=df_temp.ix[:,columns_len-4]
+    Y4_Value=str(list(df_temp_2))
+
+    Y5_name=df_temp.columns[columns_len-5]
+    df_temp_2=df_temp.ix[:,columns_len-5]
+    Y5_Value=str(list(df_temp_2))
+
+    Y6_name=df_temp.columns[columns_len-6]
+    df_temp_2=df_temp.ix[:,columns_len-6]
+    Y6_Value=str(list(df_temp_2))
+
+    Y7_name=df_temp.columns[columns_len-7]
+    df_temp_2=df_temp.ix[:,columns_len-7]
+    Y7_Value=str(list(df_temp_2))
+
+    Y8_name=df_temp.columns[columns_len-8]
+    df_temp_2=df_temp.ix[:,columns_len-8]
+    Y8_Value=str(list(df_temp_2))
+
+    Y9_name=df_temp.columns[columns_len-9]
+    df_temp_2=df_temp.ix[:,columns_len-9]
+    Y9_Value=str(list(df_temp_2))
+
+    Y10_name=df_temp.columns[columns_len-10]
+    df_temp_2=df_temp.ix[:,columns_len-10]
+    Y10_Value=str(list(df_temp_2))
+
+    return title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+            Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value
+
+
 
 def Analysis_Var_2_display_in_html(stock_name,merge_filepath,date_from_which_year):
     df_temp=pd.read_csv(merge_filepath)
@@ -192,8 +246,6 @@ def Write_2_html(*x):
 
 
 
-
-
 def GetValue(stock_name,symbol,filepath,analysis_filepath):
     global year_analysis_number
     data_sina=requests.get('http://hq.sinajs.cn/list='+symbol)
@@ -283,36 +335,47 @@ def Merge_data(stock_name,A_filepath,HK_filepath,merge_filepath):
     df=pd.merge(A_df,HK_df,left_index=True,right_index=True,how='inner')
 
     to_now_ZhangFu='_2now_ZhangFu'
+    to_now_ZhangFu_pairtrade='_2now_ZhangFu_pairtrade'
     year=time.strftime('%Y')
     last_year_ZhangFu_position=8
 
     for tmp in range(0,year_analysis_number):
+        df_all_tmp=pd.DataFrame()
+
         #Date_x	O_x	H_x	L_x	C_x	Volume_x	today_percent  1+x%  2016_2now_ZhangFu_x	2015_2now_ZhangFu_x	2014_2now_ZhangFu_x	Date_y	O_y	H_y	L_y	C_y	Volume_y	today_ZhangFu	2016_2now_ZhangFu_y	2015_2now_ZhangFu_y	2014_2now_ZhangFu_y
         df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]=df.ix[:,last_year_ZhangFu_position+tmp]-df.ix[:,last_year_ZhangFu_position+(year_analysis_number-1)+(last_year_ZhangFu_position+1)+tmp]
+
+        #计算配对交易Z_score
+        tmp_df=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu][df.index>datetime.datetime(int(year)-tmp,1,1)]
+        tmp_mean=tmp_df.mean()
+        tmp_std=np.std(tmp_df)
+        tmp_result=(tmp_df-tmp_mean)/tmp_std
+
+        df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu_pairtrade]=tmp_result
+        df_all_tmp[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu_pairtrade]=tmp_result
+
         #使用最原始暴力合并，即各个股票的最近3年（2016、2015、2014年）的统计数据整合在一起
         if tmp==0:
             if len(df_1_all)==0:
-                df_1_all=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]
+                df_1_all[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu_pairtrade]=tmp_result
             else:
                 #df_1_all=pd.merge(df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu],left_index=True,right_index=True,how='outer')
-                df_1_all=pd.concat([df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]],axis=1)
+                df_1_all=pd.concat([df_1_all,df_all_tmp],axis=1)
 
         if tmp==1:
             if len(df_2_all)==0:
-                df_2_all=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]
+                df_2_all[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu_pairtrade]=tmp_result
             else:
-                #df_2_all=pd.merge(df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu],left_index=True,right_index=True,how='outer')
-                df_2_all=pd.concat([df_2_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]],axis=1)
+                #df_2_all=pd.concat([df_2_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu_pairtrade]],axis=1)
+                df_2_all=pd.concat([df_2_all,df_all_tmp],axis=1)
 
         if tmp==2:
             if len(df_3_all)==0:
-                df_3_all=df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]
+                df_3_all[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu_pairtrade]=tmp_result
             else:
-                #df_3_all=pd.merge(df_1_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu],left_index=True,right_index=True,how='outer')
-                df_3_all=pd.concat([df_3_all,df[stock_name+"_"+str(int(year)-tmp)+to_now_ZhangFu]],axis=1)
+                df_3_all=pd.concat([df_3_all,df_all_tmp],axis=1)
+
     df.to_csv(merge_filepath,index=False)
-
-
 
 
 #东江环保
@@ -330,7 +393,6 @@ date_from_which_year=2014
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('DJHB',DJHB_HK_merge_filepath,date_from_which_year)
 Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 #(写入文件名,标题,X横坐标,Y1变量名，Y1变量值，Y2变量名，Y2变量值......   ）
-
 
 
 #建设银行
@@ -395,18 +457,6 @@ write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\DBDQ\Visual.html"
 date_from_which_year=2014
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('DBDQ',DBDQ_HK_merge_filepath,date_from_which_year)
 Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
-
-#测试后应该放在源码最后面
-Top_N=3
-n=len(df_1_all)
-df_1_all=df_1_all.T.sort_index(by=df_1_all.index[n-1]).tail(Top_N).T
-df_1_all.to_csv(df_1_all_path)
-
-df_2_all.to_csv(df_2_all_path)
-df_3_all.to_csv(df_3_all_path)
-
-#根据最后一行的累计操作结果对列进行排序，这个可以按需抽取出需要的TOP N来输出
-#df_GenZhang_JiaQiang=df_GenZhang_JiaQiang.T.sort_index(by=n-1).T
 
 
 #海信科龙
@@ -656,3 +706,46 @@ LZJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\Merge.csv"
 GetValue('LZJT','sz000513',LZJT_A_filepath, LZJT_A_analysis_filepath)
 GetValue('LZJT','hk01513', LZJT_HK_filepath,LZJT_HK_analysis_filepath)
 Merge_data('LZJT',LZJT_A_analysis_filepath,LZJT_HK_analysis_filepath,LZJT_HK_merge_filepath)
+
+
+#测试后应该放在源码最后面
+df_1_all.to_csv("c:\9\df_1_all.csv")
+df_2_all.to_csv("c:\9\df_2_all.csv")
+df_3_all.to_csv("c:\9\df_3_all.csv")
+
+Top_N=10
+
+df_1_all=df_1_all.fillna(method='ffill')
+df_2_all=df_2_all.fillna(method='ffill')
+df_3_all=df_3_all.fillna(method='ffill')
+
+df_1_all=df_1_all.fillna(method='bfill')
+df_2_all=df_2_all.fillna(method='bfill')
+df_3_all=df_3_all.fillna(method='bfill')
+
+n=len(df_1_all)
+df_1_all=df_1_all.T.sort_index(by=df_1_all.index[n-1]).tail(Top_N).T
+df_1_all.to_csv(df_1_all_path)
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_1_all_path,2016)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_1_all.html"
+Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+
+n=len(df_2_all)
+df_2_all=df_2_all.T.sort_index(by=df_2_all.index[n-1]).tail(Top_N).T
+df_2_all.to_csv(df_2_all_path)
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_2_all_path,2015)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_2_all.html"
+Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+
+n=len(df_3_all)
+df_3_all=df_3_all.T.sort_index(by=df_3_all.index[n-1]).tail(Top_N).T
+df_3_all.to_csv(df_3_all_path)
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_3_all_path,2014)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_3_all.html"
+Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
