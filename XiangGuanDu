@@ -22,9 +22,13 @@ df_3_all=pd.DataFrame()
 
 Base_path="C:\\IBM-9\\A_HK_XiangGuan\\"
 
-df_1_all_path=Base_path+"df_1_all.csv"
-df_2_all_path=Base_path+"df_2_all.csv"
-df_3_all_path=Base_path+"df_3_all.csv"
+df_1_all_ReadytoUP_path=Base_path+"df_1_all_ReadytoUP.csv"
+df_2_all_ReadytoUP_path=Base_path+"df_2_all_ReadytoUP.csv"
+df_3_all_ReadytoUP_path=Base_path+"df_3_all_ReadytoUP.csv"
+
+df_1_all_ReadytoDown_path=Base_path+"df_1_all_ReadytoDown.csv"
+df_2_all_ReadytoDown_path=Base_path+"df_2_all_ReadytoDown.csv"
+df_3_all_ReadytoDown_path=Base_path+"df_3_all_ReadytoDown.csv"
 
 def Analysis_Top10_Var_2_display_in_html(all_data_filepath,date_from_which_year):
     df_temp=pd.read_csv(all_data_filepath)
@@ -515,6 +519,11 @@ HXKL_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\Merge.csv"
 GetValue('HXKL','sz000921',HXKL_A_filepath, HXKL_A_analysis_filepath)
 GetValue('HXKL','hk00921', HXKL_HK_filepath,HXKL_HK_analysis_filepath)
 Merge_data('HXKL',HXKL_A_analysis_filepath,HXKL_HK_analysis_filepath,HXKL_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\HXKL\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('HXKL',HXKL_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #新华制药
 XHZY_A_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\A.csv"
@@ -525,6 +534,11 @@ XHZY_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\Merge.csv"
 GetValue('XHZY','sz000756',XHZY_A_filepath, XHZY_A_analysis_filepath)
 GetValue('XHZY','hk00719', XHZY_HK_filepath,XHZY_HK_analysis_filepath)
 Merge_data('XHZY',XHZY_A_analysis_filepath,XHZY_HK_analysis_filepath,XHZY_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\XHZY\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('XHZY',XHZY_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #山东墨龙
 SDML_A_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\A.csv"
@@ -535,6 +549,11 @@ SDML_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\Merge.csv"
 GetValue('SDML','sz002490',SDML_A_filepath, SDML_A_analysis_filepath)
 GetValue('SDML','hk00568', SDML_HK_filepath,SDML_HK_analysis_filepath)
 Merge_data('SDML',SDML_A_analysis_filepath,SDML_HK_analysis_filepath,SDML_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\SDML\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('SDML',SDML_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #浙江世宝
 ZJSB_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\A.csv"
@@ -545,7 +564,11 @@ ZJSB_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\Merge.csv"
 GetValue('ZJSB','sz002703',ZJSB_A_filepath, ZJSB_A_analysis_filepath)
 GetValue('ZJSB','hk01057', ZJSB_HK_filepath,ZJSB_HK_analysis_filepath)
 Merge_data('ZJSB',ZJSB_A_analysis_filepath,ZJSB_HK_analysis_filepath,ZJSB_HK_merge_filepath)
-
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZJSB\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZJSB',ZJSB_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #工商银行
 GSYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\A.csv"
@@ -556,6 +579,11 @@ GSYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\Merge.csv"
 GetValue('GSYH','sh601398',GSYH_A_filepath, GSYH_A_analysis_filepath)
 GetValue('GSYH','hk01398', GSYH_HK_filepath,GSYH_HK_analysis_filepath)
 Merge_data('GSYH',GSYH_A_analysis_filepath,GSYH_HK_analysis_filepath,GSYH_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\GSYH\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('GSYH',GSYH_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #中国银行
 ZGYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\A.csv"
@@ -566,7 +594,11 @@ ZGYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\Merge.csv"
 GetValue('ZGYH','sh601988',ZGYH_A_filepath, ZGYH_A_analysis_filepath)
 GetValue('ZGYH','hk03988', ZGYH_HK_filepath,ZGYH_HK_analysis_filepath)
 Merge_data('ZGYH',ZGYH_A_analysis_filepath,ZGYH_HK_analysis_filepath,ZGYH_HK_merge_filepath)
-
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZGYH\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZGYH',ZGYH_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #交通银行
 JTYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\A.csv"
@@ -577,6 +609,12 @@ JTYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\Merge.csv"
 GetValue('JTYH','sh601328',JTYH_A_filepath, JTYH_A_analysis_filepath)
 GetValue('JTYH','hk03328', JTYH_HK_filepath,JTYH_HK_analysis_filepath)
 Merge_data('JTYH',JTYH_A_analysis_filepath,JTYH_HK_analysis_filepath,JTYH_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\JTYH\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('JTYH',JTYH_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
+
 
 #民生银行
 MSYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\A.csv"
@@ -587,6 +625,12 @@ MSYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\Merge.csv"
 GetValue('MSYH','sh600016',MSYH_A_filepath, MSYH_A_analysis_filepath)
 GetValue('MSYH','hk01988', MSYH_HK_filepath,MSYH_HK_analysis_filepath)
 Merge_data('MSYH',MSYH_A_analysis_filepath,MSYH_HK_analysis_filepath,MSYH_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\MSYH\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('MSYH',MSYH_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
+
 
 #中国太保
 ZGTB_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\A.csv"
@@ -597,6 +641,11 @@ ZGTB_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\Merge.csv"
 GetValue('ZGTB','sh601601',ZGTB_A_filepath, ZGTB_A_analysis_filepath)
 GetValue('ZGTB','hk02601', ZGTB_HK_filepath,ZGTB_HK_analysis_filepath)
 Merge_data('ZGTB',ZGTB_A_analysis_filepath,ZGTB_HK_analysis_filepath,ZGTB_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZGTB\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZGTB',ZGTB_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #中国人寿
 ZGRS_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\A.csv"
@@ -607,6 +656,11 @@ ZGRS_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\Merge.csv"
 GetValue('ZGRS','sh601628',ZGRS_A_filepath, ZGRS_A_analysis_filepath)
 GetValue('ZGRS','hk02628', ZGRS_HK_filepath,ZGRS_HK_analysis_filepath)
 Merge_data('ZGRS',ZGRS_A_analysis_filepath,ZGRS_HK_analysis_filepath,ZGRS_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZGRS\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZGRS',ZGRS_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #新华保险
 XHBX_A_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\A.csv"
@@ -617,6 +671,11 @@ XHBX_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\Merge.csv"
 GetValue('XHBX','sh601336',XHBX_A_filepath, XHBX_A_analysis_filepath)
 GetValue('XHBX','hk01336', XHBX_HK_filepath,XHBX_HK_analysis_filepath)
 Merge_data('XHBX',XHBX_A_analysis_filepath,XHBX_HK_analysis_filepath,XHBX_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\XHBX\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('XHBX',XHBX_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #广深铁路
 GSTL_A_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\A.csv"
@@ -627,6 +686,11 @@ GSTL_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\Merge.csv"
 GetValue('GSTL','sh601333',GSTL_A_filepath, GSTL_A_analysis_filepath)
 GetValue('GSTL','hk00525', GSTL_HK_filepath,GSTL_HK_analysis_filepath)
 Merge_data('GSTL',GSTL_A_analysis_filepath,GSTL_HK_analysis_filepath,GSTL_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\GSTL\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('GSTL',GSTL_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #中信银行
 ZXYH_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\A.csv"
@@ -637,7 +701,11 @@ ZXYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\Merge.csv"
 GetValue('ZXYH','sh601998',ZXYH_A_filepath, ZXYH_A_analysis_filepath)
 GetValue('ZXYH','hk00998', ZXYH_HK_filepath,ZXYH_HK_analysis_filepath)
 Merge_data('ZXYH',ZXYH_A_analysis_filepath,ZXYH_HK_analysis_filepath,ZXYH_HK_merge_filepath)
-
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZXYH\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZXYH',ZXYH_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #晨鸣纸业
 CMZY_A_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\A.csv"
@@ -648,6 +716,12 @@ CMZY_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\Merge.csv"
 GetValue('CMZY','sz000488',CMZY_A_filepath, CMZY_A_analysis_filepath)
 GetValue('CMZY','hk01812', CMZY_HK_filepath,CMZY_HK_analysis_filepath)
 Merge_data('CMZY',CMZY_A_analysis_filepath,CMZY_HK_analysis_filepath,CMZY_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\CMZY\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('CMZY',CMZY_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
+
 
 #金风科技
 JFKJ_A_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\A.csv"
@@ -658,6 +732,11 @@ JFKJ_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\Merge.csv"
 GetValue('JFKJ','sz002202',JFKJ_A_filepath, JFKJ_A_analysis_filepath)
 GetValue('JFKJ','hk02208', JFKJ_HK_filepath,JFKJ_HK_analysis_filepath)
 Merge_data('JFKJ',JFKJ_A_analysis_filepath,JFKJ_HK_analysis_filepath,JFKJ_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\JFKJ\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('JFKJ',JFKJ_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 #中兴通讯
 ZXTX_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\A.csv"
@@ -668,9 +747,11 @@ ZXTX_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\Merge.csv"
 GetValue('ZXTX','sz000063',ZXTX_A_filepath, ZXTX_A_analysis_filepath)
 GetValue('ZXTX','hk00763', ZXTX_HK_filepath,ZXTX_HK_analysis_filepath)
 Merge_data('ZXTX',ZXTX_A_analysis_filepath,ZXTX_HK_analysis_filepath,ZXTX_HK_merge_filepath)
-
-
-
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZXTX\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZXTX',ZXTX_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 
 NYYH_A_filepath="C:\\IBM-9\\A_HK_XiangGuan\\NYYH\\A.csv"
@@ -681,6 +762,11 @@ NYYH_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\NYYH\Merge.csv"
 GetValue('NYYH','sh601288',NYYH_A_filepath, NYYH_A_analysis_filepath)
 GetValue('NYYH','hk01288', NYYH_HK_filepath,NYYH_HK_analysis_filepath)
 Merge_data('NYYH',NYYH_A_analysis_filepath,NYYH_HK_analysis_filepath,NYYH_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\NYYH\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('NYYH',NYYH_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 NHGS_A_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\A.csv"
 NHGS_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\A_analysis.csv"
@@ -690,6 +776,11 @@ NHGS_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\Merge.csv"
 GetValue('NHGS','sh600377',NHGS_A_filepath, NHGS_A_analysis_filepath)
 GetValue('NHGS','hk00177', NHGS_HK_filepath,NHGS_HK_analysis_filepath)
 Merge_data('NHGS',NHGS_A_analysis_filepath,NHGS_HK_analysis_filepath,NHGS_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\NHGS\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('NHGS',NHGS_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 HLSN_A_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\A.csv"
 HLSN_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\A_analysis.csv"
@@ -699,6 +790,11 @@ HLSN_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\Merge.csv"
 GetValue('HLSN','sh600585',HLSN_A_filepath, HLSN_A_analysis_filepath)
 GetValue('HLSN','hk00914', HLSN_HK_filepath,HLSN_HK_analysis_filepath)
 Merge_data('HLSN',HLSN_A_analysis_filepath,HLSN_HK_analysis_filepath,HLSN_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\HLSN\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('HLSN',HLSN_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 ZGPA_A_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\A.csv"
 ZGPA_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\A_analysis.csv"
@@ -708,6 +804,11 @@ ZGPA_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\Merge.csv"
 GetValue('ZGPA','sh601318',ZGPA_A_filepath, ZGPA_A_analysis_filepath)
 GetValue('ZGPA','hk02318', ZGPA_HK_filepath,ZGPA_HK_analysis_filepath)
 Merge_data('ZGPA',ZGPA_A_analysis_filepath,ZGPA_HK_analysis_filepath,ZGPA_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\ZGPA\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('ZGPA',ZGPA_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 GFZQ_A_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\A.csv"
 GFZQ_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\A_analysis.csv"
@@ -717,6 +818,11 @@ GFZQ_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\Merge.csv"
 GetValue('GFZQ','sz000776',GFZQ_A_filepath, GFZQ_A_analysis_filepath)
 GetValue('GFZQ','hk01776', GFZQ_HK_filepath,GFZQ_HK_analysis_filepath)
 Merge_data('GFZQ',GFZQ_A_analysis_filepath,GFZQ_HK_analysis_filepath,GFZQ_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\GFZQ\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('GFZQ',GFZQ_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 WCDL_A_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\A.csv"
 WCDL_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\A_analysis.csv"
@@ -726,6 +832,11 @@ WCDL_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\Merge.csv"
 GetValue('WCDL','sz000338',WCDL_A_filepath, WCDL_A_analysis_filepath)
 GetValue('WCDL','hk02338', WCDL_HK_filepath,WCDL_HK_analysis_filepath)
 Merge_data('WCDL',WCDL_A_analysis_filepath,WCDL_HK_analysis_filepath,WCDL_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\WCDL\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('WCDL',WCDL_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 AGGF_A_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\A.csv"
 AGGF_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\A_analysis.csv"
@@ -735,6 +846,11 @@ AGGF_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\Merge.csv"
 GetValue('AGGF','sz000898',AGGF_A_filepath, AGGF_A_analysis_filepath)
 GetValue('AGGF','hk00347', AGGF_HK_filepath,AGGF_HK_analysis_filepath)
 Merge_data('AGGF',AGGF_A_analysis_filepath,AGGF_HK_analysis_filepath,AGGF_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\AGGF\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('AGGF',AGGF_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 BYD_A_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\A.csv"
 BYD_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\A_analysis.csv"
@@ -744,6 +860,11 @@ BYD_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\Merge.csv"
 GetValue('BYD','sz002594',BYD_A_filepath, BYD_A_analysis_filepath)
 GetValue('BYD','hk01211', BYD_HK_filepath,BYD_HK_analysis_filepath)
 Merge_data('BYD',BYD_A_analysis_filepath,BYD_HK_analysis_filepath,BYD_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\BYD\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('BYD',BYD_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 LZJT_A_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\A.csv"
 LZJT_A_analysis_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\A_analysis.csv"
@@ -753,6 +874,11 @@ LZJT_HK_merge_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\Merge.csv"
 GetValue('LZJT','sz000513',LZJT_A_filepath, LZJT_A_analysis_filepath)
 GetValue('LZJT','hk01513', LZJT_HK_filepath,LZJT_HK_analysis_filepath)
 Merge_data('LZJT',LZJT_A_analysis_filepath,LZJT_HK_analysis_filepath,LZJT_HK_merge_filepath)
+write_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\LZJT\Visual.html"
+#2014年以来的数据
+date_from_which_year=2014
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value=Analysis_Var_2_display_in_html('LZJT',LZJT_HK_merge_filepath,date_from_which_year)
+Write_2_html(write_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value)
 
 
 #测试后应该放在源码最后面
@@ -769,28 +895,57 @@ df_2_all=df_2_all.fillna(method='ffill')
 df_3_all=df_3_all.fillna(method='ffill')
 
 n=len(df_1_all)
-df_1_all=df_1_all.T.sort_index(by=df_1_all.index[n-1]).head(Top_N).T
-df_1_all.to_csv(df_1_all_path)
+df_1_all_ReadytoUP=df_1_all.T.sort_index(by=df_1_all.index[n-1]).head(Top_N).T
+df_1_all_ReadytoUP.to_csv(df_1_all_ReadytoUP_path)
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
-Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_1_all_path,2016)
-write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_1_all.html"
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_1_all_ReadytoUP_path,2016)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_1_all_ReadytoUP.html"
 Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
              Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
 
 n=len(df_2_all)
-df_2_all=df_2_all.T.sort_index(by=df_2_all.index[n-1]).head(Top_N).T
-df_2_all.to_csv(df_2_all_path)
+df_2_all_ReadytoUP=df_2_all.T.sort_index(by=df_2_all.index[n-1]).head(Top_N).T
+df_2_all_ReadytoUP.to_csv(df_2_all_ReadytoUP_path)
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
-Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_2_all_path,2015)
-write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_2_all.html"
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_2_all_ReadytoUP_path,2015)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_2_all_ReadytoUP.html"
 Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
              Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
 
 n=len(df_3_all)
-df_3_all=df_3_all.T.sort_index(by=df_3_all.index[n-1]).head(Top_N).T
-df_3_all.to_csv(df_3_all_path)
+df_3_all_ReadytoUP=df_3_all.T.sort_index(by=df_3_all.index[n-1]).head(Top_N).T
+df_3_all_ReadytoUP.to_csv(df_3_all_ReadytoUP_path)
 title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
-Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_3_all_path,2014)
-write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_3_all.html"
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_3_all_ReadytoUP_path,2014)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_3_all_ReadytoUP.html"
 Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
-Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+
+n=len(df_1_all)
+df_1_all_ReadytoDown=df_1_all.T.sort_index(by=df_1_all.index[n-1]).tail(Top_N).T
+df_1_all_ReadytoDown.to_csv(df_1_all_ReadytoDown_path)
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_1_all_ReadytoDown_path,2016)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_1_all_ReadytoDown.html"
+Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+
+n=len(df_2_all)
+df_2_all_ReadytoDown=df_2_all.T.sort_index(by=df_2_all.index[n-1]).head(Top_N).T
+df_2_all_ReadytoDown.to_csv(df_2_all_ReadytoDown_path)
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_2_all_ReadytoDown_path,2015)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_2_all_ReadytoDown.html"
+Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+
+
+n=len(df_3_all)
+df_3_all_ReadytoDown=df_3_all.T.sort_index(by=df_3_all.index[n-1]).head(Top_N).T
+df_3_all_ReadytoDown.to_csv(df_3_all_ReadytoDown_path)
+title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_3_all_ReadytoDown_path,2014)
+write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_3_all_ReadytoDown.html"
+Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
+             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
+
