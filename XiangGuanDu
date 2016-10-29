@@ -20,6 +20,8 @@ df_1_all=pd.DataFrame()
 df_2_all=pd.DataFrame()
 df_3_all=pd.DataFrame()
 
+ERROR_String="ERROR:"
+
 Base_path="C:\\IBM-9\\A_HK_XiangGuan\\"
 
 df_1_all_ReadytoUP_path=Base_path+"df_1_all_ReadytoUP.csv"
@@ -134,14 +136,16 @@ def Analysis_Var_2_display_in_html(stock_name,merge_filepath,date_from_which_yea
 
 
 def Write_2_html(*x):
-
+    global ERROR_String
     #(写入文件名,标题,X横坐标,Y1变量名，Y1变量值，Y2变量名，Y2变量值......   ）
 
-    write_2_html_part_1="""
+    write_2_html_part_1_session_0="""
     <!DOCTYPE html>
     <head>
         <meta charset="utf-8">
-        <title>ECharts</title>
+    """
+
+    write_2_html_part_1_session_1="""
     </head>
     <body>
         <div id="main" style="height:700px"></div>
@@ -152,10 +156,14 @@ def Write_2_html(*x):
     #写入内容到html的文件路径
     write_2_html_filepath=x[0]
     f=open(write_2_html_filepath,'w')
-    print >>f,write_2_html_part_1
 
-    #标题
+     #标题
     title_str=x[1]
+
+    print >>f,write_2_html_part_1_session_0
+    print >>f,"<title>",title_str,"</title>"
+    print >>f,write_2_html_part_1_session_1
+
 
     #横坐标:日期
     Date_A = x[2]
@@ -213,12 +221,21 @@ def Write_2_html(*x):
         trigger: 'axis'
     },
     title : {
-        text: Latest_Date
+        text: Latest_Date,
+    """
+    print >>f,write_2_html_part_3
+
+    if len(ERROR_String)!=6:
+        print >>f,"subtext:",ERROR_String
+
+    write_2_html_part_3_modify="""
+        x   : 'center',
+        y   : 'bottom',
     },
     legend: {
     """
 
-    print >>f,write_2_html_part_3
+    print >>f,write_2_html_part_3_modify
 
     print >>f,' data:',Data_All
 
@@ -226,6 +243,9 @@ def Write_2_html(*x):
         },
         toolbox: {
             show : true,
+               x : 'right',
+               y : 'center',
+          orient : 'vertical',
             feature : {
                 mark : {show: true},
                 dataView : {show: true, readOnly: false},
@@ -299,6 +319,7 @@ def Write_2_html(*x):
 
 def GetValue(stock_name,symbol,filepath,analysis_filepath):
     global year_analysis_number
+    global ERROR_String
     data_sina=requests.get('http://hq.sinajs.cn/list='+symbol)
     if symbol.find('sh') >= 0 or symbol.find('sz') >= 0:
         data_stock=data_sina.text.split(',')
@@ -342,7 +363,8 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
         former_day=time.strptime(df.tail(1).ix[:,0].max()," %Y/%m/%d")
         former_close=df.tail(1).ix[:,4].max()
 
-    if former_day!=stock_date:
+    #加多限制条件，满足才写入---2016.10.29
+    if former_day!=stock_date and data_stock_Open!='0' and data_stock_High!='0' and data_stock_Low!='0'and data_stock_Close!='0' and today_percent!=-1:
         today_percent=( float(data_stock_Close)-float(former_close) )/float(former_close)
         #c2=stock_date_string+','+data_stock_Open+','+data_stock_High+','+data_stock_Low+','+data_stock_Close+','+data_stock_volume+','+str(today_percent)+'\r'
         #针对通达信格式，否则使用UltraEdit可以看到奇怪的格式！
@@ -351,6 +373,11 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
         f=open(filepath,"a")
         f.write(c2)
         f.close()
+
+    if  not(data_stock_Open!='0' and data_stock_High!='0' and data_stock_Low!='0'and data_stock_Close!='0' and today_percent!=-1):
+        ERROR_String=ERROR_String+stock_name+","
+
+
 
     #计算每天到初始值的涨幅
     df=pd.read_csv(filepath)
@@ -947,5 +974,4 @@ title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name
 Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value=Analysis_Top10_Var_2_display_in_html(df_3_all_ReadytoDown_path,2014)
 write_TopN_2_html_filepath="C:\IBM-9\A_HK_XiangGuan\df_3_all_ReadytoDown.html"
 Write_2_html(write_TopN_2_html_filepath,title_str,Date_X_axis,Y1_name,Y1_Value,Y2_name,Y2_Value,Y3_name,Y3_Value,Y4_name,Y4_Value,Y5_name,Y5_Value,\
-             Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
-
+Y6_name,Y6_Value,Y7_name,Y7_Value,Y8_name,Y8_Value,Y9_name,Y9_Value,Y10_name,Y10_Value)
