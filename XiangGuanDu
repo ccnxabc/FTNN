@@ -32,6 +32,9 @@ df_1_all_ReadytoDown_path=Base_path+"df_1_all_ReadytoDown.csv"
 df_2_all_ReadytoDown_path=Base_path+"df_2_all_ReadytoDown.csv"
 df_3_all_ReadytoDown_path=Base_path+"df_3_all_ReadytoDown.csv"
 
+
+error_file_path=Base_path+"XiangGuan_ErrorMessage.txt"
+
 def Analysis_Top10_Var_2_display_in_html(all_data_filepath,date_from_which_year):
     df_temp=pd.read_csv(all_data_filepath)
     df_temp.index=pd.tseries.index.DatetimeIndex(df_temp.ix[:,0])
@@ -320,6 +323,8 @@ def Write_2_html(*x):
 def GetValue(stock_name,symbol,filepath,analysis_filepath):
     global year_analysis_number
     global ERROR_String
+    global error_file_path
+
     data_sina=requests.get('http://hq.sinajs.cn/list='+symbol)
     if symbol.find('sh') >= 0 or symbol.find('sz') >= 0:
         data_stock=data_sina.text.split(',')
@@ -364,7 +369,8 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
         former_close=df.tail(1).ix[:,4].max()
 
     #加多限制条件，满足才写入---2016.10.29
-    if former_day!=stock_date and data_stock_Open!='0' and data_stock_High!='0' and data_stock_Low!='0'and data_stock_Close!='0' and today_percent!=-1:
+    #增加float(data_stock_Open)，否则如果这样data_stock_Open!='0'：当data_stock_Open采集到0.000时，data_stock_Open!='0'为True，而不是预期的为False---20161223
+    if former_day!=stock_date and float(data_stock_Open)!=0 and float(data_stock_High)!=0 and float(data_stock_Low)!=0and float(data_stock_Close)!=0:
         today_percent=( float(data_stock_Close)-float(former_close) )/float(former_close)
         #c2=stock_date_string+','+data_stock_Open+','+data_stock_High+','+data_stock_Low+','+data_stock_Close+','+data_stock_volume+','+str(today_percent)+'\r'
         #针对通达信格式，否则使用UltraEdit可以看到奇怪的格式！
@@ -374,8 +380,15 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
         f.write(c2)
         f.close()
 
-    if  not(data_stock_Open!='0' and data_stock_High!='0' and data_stock_Low!='0'and data_stock_Close!='0' and today_percent!=-1):
+    #增加float(data_stock_Open)，否则如果这样data_stock_Open!='0'：当data_stock_Open采集到0.000时，data_stock_Open!='0'为True，而不是预期的为False---20161223
+    if  not(float(data_stock_Open)!=0 and float(data_stock_High)!=0 and float(data_stock_Low)!=0 and float(data_stock_Close)!=0):
         ERROR_String=ERROR_String+stock_name+","
+
+        Error_Message_2_txt="\n"+stock_date_string+","+stock_name
+
+        f=open(error_file_path,"a")
+        f.write(Error_Message_2_txt)
+        f.close()
 
 
 
