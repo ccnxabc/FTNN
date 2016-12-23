@@ -370,7 +370,7 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
 
     #加多限制条件，满足才写入---2016.10.29
     #增加float(data_stock_Open)，否则如果这样data_stock_Open!='0'：当data_stock_Open采集到0.000时，data_stock_Open!='0'为True，而不是预期的为False---20161223
-    if former_day!=stock_date and float(data_stock_Open)!=0 and float(data_stock_High)!=0 and float(data_stock_Low)!=0and float(data_stock_Close)!=0:
+    if former_day!=stock_date and float(data_stock_Open)!=0 and float(data_stock_High)!=0 and float(data_stock_Low)!=0 and float(data_stock_Close)!=0:
         today_percent=( float(data_stock_Close)-float(former_close) )/float(former_close)
         #c2=stock_date_string+','+data_stock_Open+','+data_stock_High+','+data_stock_Low+','+data_stock_Close+','+data_stock_volume+','+str(today_percent)+'\r'
         #针对通达信格式，否则使用UltraEdit可以看到奇怪的格式！
