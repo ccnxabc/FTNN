@@ -229,7 +229,8 @@ def Write_2_html(*x):
     print >>f,write_2_html_part_3
 
     if len(ERROR_String)!=6:
-        print >>f,"subtext:",ERROR_String
+        #20161226新增'  ',否则subtext显示错误
+        print >>f,"subtext:'",ERROR_String,"',"
 
     write_2_html_part_3_modify="""
         x   : 'center',
@@ -390,7 +391,27 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
         f.write(Error_Message_2_txt)
         f.close()
 
+        #20161227改进：对于停牌的沿用上一天数据(成交量为0是最明显标志)，否则最后结果输出会因为一颗老鼠屎坏了一锅粥，最终的结果因为这个永远停留在停牌那天
+        #获取文件最后一行信息
+        f=open(filepath,"r")
+        lines=f.readlines()
+        f.close()
 
+        tmp_last_day_value=lines[-1].split(",")
+        #OHLC都等于上一天的收盘价
+        data_stock_Close=tmp_last_day_value[4]
+        data_stock_Open=data_stock_Close
+        data_stock_High=data_stock_Close
+        data_stock_Low=data_stock_Close
+        data_stock_volume="0"
+        today_percent="0"
+
+        if former_day!=stock_date:
+            c2=stock_date_string+','+data_stock_Open+','+data_stock_High+','+data_stock_Low+','+data_stock_Close+','+data_stock_volume+','+str(today_percent)+'\n'
+            f=open(filepath,"a")
+            f.write(c2)
+            f.close()
+        #20161227改进结束
 
     #计算每天到初始值的涨幅
     df=pd.read_csv(filepath)
