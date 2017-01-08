@@ -425,6 +425,10 @@ def GetValue(stock_name,symbol,filepath,analysis_filepath):
     for tmp in range(0,year_analysis_number):
         #因为1月1日香港美国大陆均放假，因此这个>xxxx年1月1日肯定包含了所有的交易日数据
         #使用累计乘积cumprod()
+
+        #20170108 强制让年份为2016；如果以2017新开始计算的话，至少半年内的数据（因为太少）基本无法使用
+        #如果数据样本足够多，2014，2015，2016以来的曲线应该会逐渐重合在一起吧
+        year=2016
         df[str(int(year)-tmp)+to_now_ZhangFu]=df[df.index>datetime.datetime(int(year)-tmp,1,1)].ix[:,today_percent_position+1].cumprod()
 
     df.to_csv(analysis_filepath,index=False)
@@ -452,6 +456,10 @@ def Merge_data(stock_name,A_filepath,HK_filepath,merge_filepath):
     last_year_ZhangFu_position=8
 
     for tmp in range(0,year_analysis_number):
+
+        #20170108 强制让年份为2016；如果以2017新开始计算的话，至少半年内的数据（因为太少）基本无法使用
+        #如果数据样本足够多，2014，2015，2016以来的曲线应该会逐渐重合在一起吧
+        year=2016
         df_all_tmp=pd.DataFrame()
 
         #Date_x	O_x	H_x	L_x	C_x	Volume_x	today_percent  1+x%  2016_2now_ZhangFu_x	2015_2now_ZhangFu_x	2014_2now_ZhangFu_x	Date_y	O_y	H_y	L_y	C_y	Volume_y	today_ZhangFu	2016_2now_ZhangFu_y	2015_2now_ZhangFu_y	2014_2now_ZhangFu_y
